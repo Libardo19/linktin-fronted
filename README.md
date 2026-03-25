@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 🔗 Linktin — Frontend
 
-## Getting Started
+> Web application for the professional networking platform that bridges the gap between companies seeking talent and professionals seeking opportunities.
 
-First, run the development server:
+Built with **Next.js 14** (App Router + SSR) and **Tailwind CSS**, consuming the Linktin REST API. Features real-time chat via **Socket.io**, protected routing with JWT stored in HttpOnly cookies, and a fully responsive interface.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+---
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📋 About the Project
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+Linktin is a professional networking platform that connects companies looking for the right talent with professionals and students looking for their next opportunity. Through a skill-based matching engine, the platform automatically calculates compatibility between what a company needs and what a professional offers, eliminating manual searching and putting the right person in front of the right opportunity.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+The frontend delivers the complete user experience: company and professional profile pages, job opportunity feed, matching interface with visual compatibility scores, real-time messaging, and reputation visualization. Pages are pre-rendered on the server with **Next.js SSR** for fast load times and better SEO.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Tech Stack
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Technology | Purpose |
+|------------|---------|
+| Next.js 14 | React framework with SSR and App Router |
+| React | UI component library |
+| Tailwind CSS | Utility-first styling |
+| Socket.io Client | Real-time WebSocket communication |
+| Axios | HTTP requests to the backend API |
+| JWT (HttpOnly Cookie) | Secure session management |
+| Next.js Middleware | Automatic route protection |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## 👥 Team
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Name | Role |
+|------|------|
+| Libardo Acosta | Developer |
+| Sergio Saucedo | Developer |
+| Andrea Sierra | Developer |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+
+*Backend repository → [[linktin-backend](#)*](https://github.com/Libardo19/linktin-backend/tree/main?tab=readme-ov-file)*
