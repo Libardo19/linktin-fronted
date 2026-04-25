@@ -1,10 +1,10 @@
-import { AuthProvider } from "../context/AuthContext";
-import "./globals.css";
+import { AuthProvider } from '../context/AuthContext'
+import './globals.css'
 
 export const metadata = {
-  title: "Linktin",
-  description: "Professional networking platform",
-};
+  title: 'Linktin',
+  description: 'Professional networking platform',
+}
 
 export default function RootLayout({ children }) {
   return (
@@ -15,5 +15,5 @@ export default function RootLayout({ children }) {
         </AuthProvider>
       </body>
     </html>
-  );
+  )
 }
