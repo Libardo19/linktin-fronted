@@ -1,0 +1,7 @@
+export { default as LandingPage }        from './LandingPage'
+export { default as Navbar }             from './Navbar'
+export { default as Hero }               from './Hero'
+export { default as ValuePropositions }  from './ValuePropositions'
+export { default as PlatformPreview }    from './PlatformPreview'
+export { default as CTA }                from './CTA'
+export { default as Footer }             from './Footer'
