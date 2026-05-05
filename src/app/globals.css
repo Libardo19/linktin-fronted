@@ -1,42 +1,39 @@
-
-
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@400;500&display=swap');
 @import "tailwindcss";
 
-:root {
-  --primary:            #002045;
-  --primary-container:  #1a365d;
-  --secondary:          #0061a5;
-  --secondary-container:#66affe33;
-  --tertiary:           #4f2e00;
-  --tertiary-container: #6b3f00;
-  --neutral:            #f2f4f6;
-
-  --surface:                  #f7f9fb;
-  --surface-container-lowest: #ffffff;
-  --surface-container-low:    #f2f4f6;
-  --surface-container:        #eaecef;
-  --surface-container-high:   #e6e8ea;
-  --surface-dim:              #d8dadc;
-
-  --on-surface:         #191c1e;
-  --on-surface-variant: #43474e;
-  --on-primary:         #ffffff;
-  --outline-variant:    #c4c6cf;
+@theme {
+  --font-sora: 'Sora', sans-serif;
+  --font-dm: 'DM Sans', sans-serif;
 }
 
+/* VARIABLES */
+:root {
+  --primary: #002045;
+  --secondary: #0061a5;
+  --tertiary: #4f2e00;
+
+  --surface: #f7f9fb;
+  --surface-container-lowest: #ffffff;
+  --surface-container-low: #f2f4f6;
+
+  --on-surface: #191c1e;
+  --on-surface-variant: #43474e;
+  --on-primary: #ffffff;
+  --outline-variant: #c4c6cf;
+}
+
+/* RESET */
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--surface);
   color: var(--on-surface);
-  -webkit-font-smoothing: antialiased;
 }
 
+/* TIPOGRAFÍA */
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Manrope', sans-serif;
   letter-spacing: -0.02em;

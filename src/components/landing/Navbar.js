@@ -1,84 +1,48 @@
-    'use client'
+'use client'
 
-    import { useState, useEffect } from 'react'
-    import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import Link from 'next/link'
 
-    export default function Navbar() {
-    const [scrolled, setScrolled] = useState(false)
+export default function Navbar() {
+  const [scrolled, setScrolled] = useState(false)
 
-    useEffect(() => {
-        const onScroll = () => setScrolled(window.scrollY > 20)
-        window.addEventListener('scroll', onScroll)
-        return () => window.removeEventListener('scroll', onScroll)
-    }, [])
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll)
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
-    return (
-        <nav style={{
-        position: 'fixed', top: 0, left: 0, right: 0, zIndex: 100,
-        height: 64,
-        background: scrolled ? 'rgba(255,255,255,0.92)' : 'transparent',
-        backdropFilter: scrolled ? 'blur(12px)' : 'none',
-        borderBottom: scrolled ? '1px solid #F1F5F9' : '1px solid transparent',
-        transition: 'all .3s ease',
-        display: 'flex', alignItems: 'center',
-        padding: '0 48px',
-        }}>
-        {/* Logo */}
-        <Link href="/" style={{ textDecoration: 'none', marginRight: 48 }}>
-            <span style={{
-            fontFamily: "'Sora', sans-serif", fontSize: 20, fontWeight: 800,
-            letterSpacing: -0.5, color: '#0F172A',
-            }}>
-            Link<span style={{ color: '#1D4ED8' }}>Tin</span>
-            </span>
+  return (
+    <nav className={`fixed top-0 left-0 right-0 z-50 h-16 flex items-center px-12 transition-all duration-300 ${
+      scrolled ? 'bg-white/90 backdrop-blur-xl border-b border-slate-100' : 'bg-transparent border-b border-transparent'
+    }`}>
+      <Link href="/" className="no-underline mr-12">
+        <span className="text-xl font-extrabold text-slate-900 font-sora">
+          Link<span className="text-blue-600">Tin</span>
+        </span>
+      </Link>
+
+      <div className="flex items-center gap-8 flex-1">
+        {[
+          { label: 'Buscar empleo', href: '#' },
+          { label: 'Empresas', href: '#' },
+          { label: 'Cómo funciona', href: '#' },
+          { label: 'Precios', href: '#' },
+        ].map((link) => (
+          <Link key={link.label} href={link.href} className="no-underline text-sm text-slate-600 font-medium hover:text-slate-900 transition">
+            {link.label}
+          </Link>
+        ))}
+      </div>
+
+      <div className="flex items-center gap-3">
+        <Link href="/auth/login" className="no-underline text-sm font-medium text-slate-600 px-4 py-2 rounded-lg hover:text-slate-900 transition">
+          Iniciar sesión
         </Link>
-
-        {/* Nav links */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 32, flex: 1 }}>
-            {[
-            { label: 'Buscar empleo',  href: '#' },
-            { label: 'Empresas',       href: '#' },
-            { label: 'Cómo funciona',  href: '#' },
-            { label: 'Precios',        href: '#' },
-            ].map(link => (
-            <Link key={link.label} href={link.href} style={{
-                textDecoration: 'none', fontSize: 14, color: '#475569',
-                fontFamily: "'DM Sans', sans-serif", fontWeight: 500,
-                transition: 'color .2s',
-            }}
-                onMouseEnter={e => (e.currentTarget.style.color = '#0F172A')}
-                onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
-            >
-                {link.label}
-            </Link>
-            ))}
-        </div>
-
-        {/* CTAs */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-            <Link href="/auth/login" style={{
-            textDecoration: 'none', fontSize: 14, fontWeight: 500,
-            color: '#475569', padding: '8px 16px', borderRadius: 8,
-            fontFamily: "'DM Sans', sans-serif", transition: 'color .2s',
-            }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#0F172A')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#475569')}
-            >
-            Iniciar sesión
-            </Link>
-            <Link href="/auth/register" style={{
-            textDecoration: 'none', fontSize: 14, fontWeight: 600,
-            color: '#fff', padding: '9px 20px', borderRadius: 8,
-            background: '#1D4ED8', fontFamily: "'Sora', sans-serif",
-            boxShadow: '0 2px 8px rgba(29,78,216,0.3)',
-            transition: 'background .2s, box-shadow .2s',
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = '#1e40af'; e.currentTarget.style.boxShadow = '0 4px 14px rgba(29,78,216,0.4)' }}
-            onMouseLeave={e => { e.currentTarget.style.background = '#1D4ED8'; e.currentTarget.style.boxShadow = '0 2px 8px rgba(29,78,216,0.3)' }}
-            >
-            Únete gratis
-            </Link>
-        </div>
-        </nav>
-    )
-    }
+        <Link href="/auth/register" className="no-underline text-sm font-semibold text-white px-5 py-2.5 rounded-lg bg-blue-600 font-sora hover:bg-blue-700 shadow-lg shadow-blue-500/30 transition">
+          Únete gratis
+        </Link>
+      </div>
+    </nav>
+  )
+}
