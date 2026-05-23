@@ -1,6 +1,7 @@
         'use client'
     import { useState } from 'react'
     import Link from 'next/link'
+    import { useRouter } from 'next/navigation'
     import { useAuth } from '../../../context/AuthContext'
 
     function GoogleIcon() {
@@ -180,43 +181,28 @@
     )
     }
 
-    const SKILLS_CANDIDATO = ['React','Node.js','PostgreSQL','Python','Docker','AWS','Vue.js','TypeScript','MongoDB','GraphQL']
-    const SKILLS_EMPRESA   = ['Desarrollo Frontend','Backend / APIs','DevOps / Cloud','Data Science','IA / ML','Diseño UX/UI','QA / Testing','Ciberseguridad','Mobile Dev','Gestión de Proyectos']
-
     export default function RegisterPage() {
     const { register } = useAuth()
+    const router = useRouter()
 
     const [role,        setRole]        = useState('candidato')
     const isEmpresa = role === 'empresa'
 
     const [nombre,      setNombre]      = useState('')
     const [apellido,    setApellido]    = useState('')
-    const [titulo,      setTitulo]      = useState('')
-    const [ciudad,      setCiudad]      = useState('')
-    const [empNombre,   setEmpNombre]   = useState('')
-    const [nit,         setNit]         = useState('')
-    const [sector,      setSector]      = useState('Tecnología e Innovación')
-    const [tamano,      setTamano]      = useState('11 – 50 empleados')
-    const [ciudadEmp,   setCiudadEmp]   = useState('')
-    const [sitioWeb,    setSitioWeb]    = useState('')
-    const [responsable, setResponsable] = useState('')
-    const [cargo,       setCargo]       = useState('')
     const [email,       setEmail]       = useState('')
     const [password,    setPassword]    = useState('')
     const [confirmPwd,  setConfirmPwd]  = useState('')
     const [showPwd,     setShowPwd]     = useState(false)
     const [showConf,    setShowConf]    = useState(false)
-    const [skills,      setSkills]      = useState([])
     const [terms,       setTerms]       = useState(false)
     const [loading,     setLoading]     = useState(false)
     const [error,       setError]       = useState('')
     const [focused,     setFocused]     = useState({})
+    const [success,     setSuccess]     = useState('')
 
     const pwdStrength = getPwdStrength(password)
     const pwdMatch    = confirmPwd && password === confirmPwd
-
-    const toggleSkill = (s) =>
-        setSkills(prev => prev.includes(s) ? prev.filter(x => x !== s) : [...prev, s])
 
     const handleSubmit = async (e) => {
         e.preventDefault()
@@ -228,10 +214,10 @@
         try {
         await register({
             email, password, tipo: role,
-            ...(isEmpresa
-            ? { nombre: empNombre, nit, sector, tamano, ciudad: ciudadEmp, sitioWeb, responsable, cargo }
-            : { nombre, apellido, titulo, ciudad, habilidades: skills })
+            nombre, apellido,
         })
+        setSuccess('¡Cuenta creada exitosamente! Redirigiendo al inicio de sesión…')
+        setTimeout(() => router.push('/auth/login'), 2000)
         } catch (err) {
         setError(err.response?.data?.message || 'Error al crear la cuenta. Intenta de nuevo.')
         } finally {
@@ -254,10 +240,6 @@
         onBlur:  () => setFocused(p => ({ ...p, [key]: false })),
         className: inputCls(key),
     })
-
-    const selectCls = `w-full px-3.5 py-3 rounded-lg bg-slate-50 text-slate-900 text-sm outline-none appearance-none cursor-pointer border ${
-        isEmpresa ? 'border-amber-400/50' : 'border-slate-200'
-    }`
 
     /* ── Accent shortcuts ── */
     const accentText   = isEmpresa ? 'text-amber-600'  : 'text-blue-700'
@@ -348,7 +330,7 @@
                     <button
                     key={r.id}
                     type="button"
-                    onClick={() => { setRole(r.id); setSkills([]) }}
+                    onClick={() => setRole(r.id)}
                     className={`rounded-xl p-4 border-[1.5px] ${cardCls} cursor-pointer text-left relative transition-all duration-150`}
                     >
                     {sel && <div className={`absolute top-3 right-3 w-2 h-2 rounded-full ${dotCls}`} />}
@@ -417,103 +399,29 @@
                     </div>
                     </div>
 
-                    <SectionLabel>Información profesional</SectionLabel>
-
-                    <div className="grid grid-cols-2 gap-3.5 mb-4">
-                    <div>
-                        <Label>Título profesional</Label>
-                        <input value={titulo} onChange={e => setTitulo(e.target.value)} placeholder="Full Stack Developer" {...fProps('titulo')} />
-                    </div>
-                    <div>
-                        <Label>Ciudad</Label>
-                        <input value={ciudad} onChange={e => setCiudad(e.target.value)} placeholder="Valledupar, Colombia" {...fProps('ciudad')} />
-                    </div>
-                    </div>
-
-                    <label className="block text-xs text-slate-500 font-semibold mb-1.5">
-                    Tus habilidades principales{' '}
-                    <span className="text-slate-300 font-normal">(selecciona las que aplican)</span>
-                    </label>
-                    <div className="flex flex-wrap gap-1.5 mb-5">
-                    {SKILLS_CANDIDATO.map(s => (
-                        <button key={s} type="button" onClick={() => toggleSkill(s)}
-                        className={`px-3 py-1.5 rounded-full text-xs cursor-pointer transition-all duration-150 border-[1.5px] ${
-                            skills.includes(s)
-                            ? 'border-blue-700 text-blue-700 bg-blue-50 font-semibold'
-                            : 'border-slate-200 text-slate-400 bg-slate-50'
-                        }`}>
-                        {s}
-                        </button>
-                    ))}
-                    </div>
                 </>
                 )}
 
-                {/* ══ EMPRESA ══ */}
+                {/* ══ EMPRESA (mismos campos que candidato) ══ */}
                 {isEmpresa && (
                 <>
-                    <SectionLabel>Datos de la empresa</SectionLabel>
+                    <SectionLabel>Información personal</SectionLabel>
 
                     <div className="grid grid-cols-2 gap-3.5 mb-4">
                     <div>
-                        <Label>Nombre de la empresa</Label>
-                        <input value={empNombre} onChange={e => setEmpNombre(e.target.value)} placeholder="TechNova S.A.S" {...fProps('empNombre')} />
+                        <Label>Nombre</Label>
+                        <input value={nombre} onChange={e => setNombre(e.target.value)} placeholder="Libardo" {...fProps('nombre')} />
                     </div>
                     <div>
-                        <Label>NIT / RUT</Label>
-                        <div className="relative">
-                        <input value={nit} onChange={e => setNit(e.target.value)} placeholder="900.123.456-7" {...fProps('nit')} className={inputCls('nit') + ' pr-9'} />
-                        {nit && <CheckMark />}
-                        </div>
-                    </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3.5 mb-4">
-                    <div>
-                        <Label>Sector / Industria</Label>
-                        <select value={sector} onChange={e => setSector(e.target.value)} className={selectCls}>
-                        {['Tecnología e Innovación','Finanzas','Salud','Educación','Retail','Manufactura','Consultoría'].map(o => <option key={o}>{o}</option>)}
-                        </select>
-                    </div>
-                    <div>
-                        <Label>Tamaño de la empresa</Label>
-                        <select value={tamano} onChange={e => setTamano(e.target.value)} className={selectCls}>
-                        {['1 – 10 empleados','11 – 50 empleados','51 – 200 empleados','201 – 500 empleados','500+ empleados'].map(o => <option key={o}>{o}</option>)}
-                        </select>
-                    </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3.5 mb-4">
-                    <div>
-                        <Label>Ciudad / País</Label>
-                        <input value={ciudadEmp} onChange={e => setCiudadEmp(e.target.value)} placeholder="Valledupar, Colombia" {...fProps('ciudadEmp')} />
-                    </div>
-                    <div>
-                        <Label>Sitio web</Label>
-                        <div className="relative">
-                        <input value={sitioWeb} onChange={e => setSitioWeb(e.target.value)} placeholder="www.miempresa.co" {...fProps('sitioWeb')} className={inputCls('sitioWeb') + ' pr-9'} />
-                        {sitioWeb && <CheckMark />}
-                        </div>
-                    </div>
-                    </div>
-
-                    <SectionLabel>Datos del responsable</SectionLabel>
-
-                    <div className="grid grid-cols-2 gap-3.5 mb-4">
-                    <div>
-                        <Label>Nombre del responsable</Label>
-                        <input value={responsable} onChange={e => setResponsable(e.target.value)} placeholder="María Fernanda" {...fProps('responsable')} />
-                    </div>
-                    <div>
-                        <Label>Cargo</Label>
-                        <input value={cargo} onChange={e => setCargo(e.target.value)} placeholder="Head of Talent" {...fProps('cargo')} />
+                        <Label>Apellido</Label>
+                        <input value={apellido} onChange={e => setApellido(e.target.value)} placeholder="Acosta" {...fProps('apellido')} />
                     </div>
                     </div>
 
                     <div className="mb-4">
-                    <Label>Correo corporativo</Label>
+                    <Label>Correo electrónico</Label>
                     <div className="relative">
-                        <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }} placeholder="contacto@empresa.co" {...fProps('emailEmp')} className={inputCls('emailEmp') + ' pr-9'} />
+                        <input type="email" value={email} onChange={e => { setEmail(e.target.value); setError('') }} placeholder="contacto@empresa.co" {...fProps('email')} className={inputCls('email') + ' pr-9'} />
                         {email && <CheckMark />}
                     </div>
                     </div>
@@ -522,7 +430,7 @@
                     <div>
                         <Label>Contraseña</Label>
                         <div className="relative">
-                        <input type={showPwd ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" {...fProps('pwdE')} className={inputCls('pwdE') + ' pr-9'} />
+                        <input type={showPwd ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} placeholder="••••••••" {...fProps('pwd')} className={inputCls('pwd') + ' pr-9'} />
                         <button type="button" onClick={() => setShowPwd(!showPwd)} className="absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer text-slate-400 flex">
                             <EyeIcon open={showPwd} />
                         </button>
@@ -539,29 +447,12 @@
                     <div>
                         <Label>Confirmar contraseña</Label>
                         <div className="relative">
-                        <input type={showConf ? 'text' : 'password'} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} placeholder="••••••••" {...fProps('confE')} className={inputCls('confE') + ' pr-9'} />
+                        <input type={showConf ? 'text' : 'password'} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} placeholder="••••••••" {...fProps('conf')} className={inputCls('conf') + ' pr-9'} />
                         <button type="button" onClick={() => setShowConf(!showConf)} className={`absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer flex ${pwdMatch ? 'text-emerald-500' : 'text-slate-400'}`}>
                             {pwdMatch ? <span className="text-sm">✓</span> : <EyeIcon open={showConf} />}
                         </button>
                         </div>
                     </div>
-                    </div>
-
-                    <label className="block text-xs text-slate-500 font-semibold mb-1.5">
-                    Áreas de contratación{' '}
-                    <span className="text-slate-300 font-normal">(selecciona las que aplican)</span>
-                    </label>
-                    <div className="flex flex-wrap gap-1.5 mb-5">
-                    {SKILLS_EMPRESA.map(s => (
-                        <button key={s} type="button" onClick={() => toggleSkill(s)}
-                        className={`px-3 py-1.5 rounded-full text-xs cursor-pointer transition-all duration-150 border-[1.5px] ${
-                            skills.includes(s)
-                            ? 'border-amber-600 text-amber-600 bg-amber-50 font-semibold'
-                            : 'border-slate-200 text-slate-400 bg-slate-50'
-                        }`}>
-                        {s}
-                        </button>
-                    ))}
                     </div>
                 </>
                 )}
@@ -586,6 +477,13 @@
                     : 'Entiendo que mis datos serán usados para mejorar la precisión del matching.'}
                 </p>
                 </div>
+
+                {/* Success */}
+                {success && (
+                <div className="mb-4 px-4 py-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-sm">
+                    {success}
+                </div>
+                )}
 
                 {/* Error */}
                 {error && (

@@ -12,16 +12,11 @@
     return data.data; // { token, usuario: { id, email, tipo } }
     };
 
-    export const register = async ({ id_usuarios, email, password, tipo }) => {
+    export const register = async ({ email, password, tipo }) => {
     const { data } = await api.post("/api/auth/register", {
-        id_usuarios,
         email,
         password,
         tipo,
-    });
-    Cookies.set("linktin_token", data.data.token, {
-        expires: TOKEN_EXPIRY_DAYS,
-        sameSite: "strict",
     });
     return data.data;
     };

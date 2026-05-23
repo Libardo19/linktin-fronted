@@ -46,14 +46,7 @@
     }
 
     const register = async (formData) => {
-        const data = await registerService(formData)
-        setUsuario(data.usuario)
-        if (data.usuario.tipo === 'empresa') {
-            router.push('/dashboardempresa')
-        } else {
-            router.push('/dashboardcandidato')
-        }
-        return data
+        await registerService(formData)
     }
 
     const logout = () => {
