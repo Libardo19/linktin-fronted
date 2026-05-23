@@ -3,6 +3,7 @@
     import Link from 'next/link'
     import { useRouter } from 'next/navigation'
     import { useAuth } from '../../../context/AuthContext'
+    import { Check, User, Building2 } from 'lucide-react'
 
     function GoogleIcon() {
     return (
@@ -78,7 +79,7 @@
             <div key={s} className={`flex items-center ${i < steps.length - 1 ? 'flex-1' : ''}`}>
                 <div className="flex items-center gap-1.5">
                 <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold flex-shrink-0 ${circleCls}`}>
-                    {isDone ? '✓' : i + 1}
+                    {isDone ? <Check size={12} /> : i + 1}
                 </div>
                 <span className={`text-xs ${labelCls}`}>{s}</span>
                 </div>
@@ -263,7 +264,7 @@
     )
 
     const CheckMark = () => (
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 text-sm">✓</span>
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 text-sm"><Check size={16} /></span>
     )
 
     return (
@@ -312,8 +313,8 @@
             {/* Role selector */}
             <div className="grid grid-cols-2 gap-3 mb-6">
                 {[
-                { id: 'candidato', icon: '👤', title: 'Soy candidato', desc: 'Busco oportunidades laborales y quiero conectar con empresas.' },
-                { id: 'empresa',   icon: '🏢', title: 'Soy empresa',   desc: 'Quiero publicar vacantes y encontrar el talento ideal para mi equipo.' },
+                { id: 'candidato', icon: <User size={22} />, title: 'Soy candidato', desc: 'Busco oportunidades laborales y quiero conectar con empresas.' },
+                { id: 'empresa',   icon: <Building2 size={22} />, title: 'Soy empresa',   desc: 'Quiero publicar vacantes y encontrar el talento ideal para mi equipo.' },
                 ].map(r => {
                 const sel = role === r.id
                 const cardCls = sel
@@ -393,7 +394,7 @@
                         <div className="relative">
                         <input type={showConf ? 'text' : 'password'} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} placeholder="••••••••" {...fProps('conf')} className={inputCls('conf') + ' pr-9'} />
                         <button type="button" onClick={() => setShowConf(!showConf)} className={`absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer flex ${pwdMatch ? 'text-emerald-500' : 'text-slate-400'}`}>
-                            {pwdMatch ? <span className="text-sm">✓</span> : <EyeIcon open={showConf} />}
+                            {pwdMatch ? <span className="text-sm"><Check size={16} /></span> : <EyeIcon open={showConf} />}
                         </button>
                         </div>
                     </div>
@@ -449,7 +450,7 @@
                         <div className="relative">
                         <input type={showConf ? 'text' : 'password'} value={confirmPwd} onChange={e => setConfirmPwd(e.target.value)} placeholder="••••••••" {...fProps('conf')} className={inputCls('conf') + ' pr-9'} />
                         <button type="button" onClick={() => setShowConf(!showConf)} className={`absolute right-2.5 top-1/2 -translate-y-1/2 bg-transparent border-none cursor-pointer flex ${pwdMatch ? 'text-emerald-500' : 'text-slate-400'}`}>
-                            {pwdMatch ? <span className="text-sm">✓</span> : <EyeIcon open={showConf} />}
+                            {pwdMatch ? <span className="text-sm"><Check size={16} /></span> : <EyeIcon open={showConf} />}
                         </button>
                         </div>
                     </div>
@@ -464,7 +465,7 @@
                     onClick={() => setTerms(!terms)}
                     className={`w-4 h-4 rounded flex-shrink-0 mt-0.5 flex items-center justify-center text-[9px] text-white cursor-pointer border-[1.5px] transition-colors ${terms ? accentCheck : 'bg-white border-slate-300'}`}
                 >
-                    {terms && '✓'}
+                    {terms && <Check size={12} />}
                 </button>
                 <p className="text-xs text-slate-400 leading-relaxed m-0">
                     Acepto los{' '}

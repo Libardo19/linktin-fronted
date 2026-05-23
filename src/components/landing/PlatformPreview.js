@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
+import { CheckCircle2, Check, Star, ThumbsUp, Target } from 'lucide-react'
 
 function useInView(threshold = 0.15) {
   const ref = useRef(null)
@@ -21,7 +22,7 @@ function ReputationSection() {
     <div ref={ref} className="grid grid-cols-2 gap-20 items-center transition-all duration-600" style={{ opacity: inView ? 1 : 0, transform: inView ? 'translateY(0)' : 'translateY(6)' }}>
       <div>
         <div className="inline-flex items-center gap-1.5 bg-green-50 border border-green-200 rounded-full px-3 py-1.5 mb-5">
-          <span>✅</span>
+          <CheckCircle2 size={16} className="text-green-600" />
           <span className="text-xs font-semibold text-green-600">Reputación Verificada</span>
         </div>
         <h2 className="text-4xl font-extrabold text-slate-900 font-sora mb-4 leading-tight">
@@ -38,7 +39,7 @@ function ReputationSection() {
         ].map(item => (
           <div key={item} className="flex items-start gap-2.5 mb-3">
             <div className="w-5 h-5 rounded-full bg-blue-50 border border-blue-200 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <span className="text-xs text-blue-600">✓</span>
+              <Check size={14} className="text-blue-600" />
             </div>
             <span className="text-sm text-slate-600 leading-relaxed">{item}</span>
           </div>
@@ -48,7 +49,7 @@ function ReputationSection() {
       <div className="flex flex-col gap-4">
         <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg">
           <div className="flex items-center gap-3 mb-3.5">
-            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center text-xl">⭐</div>
+            <div className="w-9 h-9 rounded-lg bg-blue-50 flex items-center justify-center"><Star size={20} className="text-blue-600 fill-blue-600" /></div>
             <div>
               <div className="font-sora text-sm font-bold text-slate-900">Skill Score: Frontend</div>
               <div className="text-xs text-slate-400">Top 5% de la plataforma</div>
@@ -65,11 +66,11 @@ function ReputationSection() {
 
         <div className="bg-white rounded-2xl p-5 border border-slate-100 shadow-lg">
           <div className="flex items-center gap-3 mb-2.5">
-            <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center text-xl">👍</div>
+            <div className="w-9 h-9 rounded-lg bg-amber-50 flex items-center justify-center"><ThumbsUp size={20} className="text-amber-600" /></div>
             <div>
               <div className="font-sora text-sm font-bold text-slate-900">Trust Index</div>
-              <div className="flex gap-0.5">
-                {[1,2,3,4,5].map(i => <span key={i} className={`text-sm ${i <= 4 ? 'text-amber-400' : 'text-slate-200'}`}>★</span>)}
+                <div className="flex gap-0.5">
+                {[1,2,3,4,5].map(i => <Star key={i} size={16} className={`${i <= 4 ? 'text-amber-400 fill-amber-400' : 'text-slate-200'}`} />)}
                 <span className="text-xs text-slate-400 ml-1">4.9/5 · 42 reseñas</span>
               </div>
             </div>
@@ -83,7 +84,7 @@ function ReputationSection() {
 
         <div className="bg-gradient-to-br from-blue-600 to-blue-500 rounded-2xl p-5 shadow-xl">
           <div className="flex items-center gap-4">
-            <div className="text-3xl">🎯</div>
+            <Target size={32} className="text-white" />
             <div>
               <div className="font-sora text-2xl font-bold text-white">847</div>
               <div className="text-sm text-white/70">Candidatos en match disponibles ahora</div>

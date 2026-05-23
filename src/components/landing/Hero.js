@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { Star, Zap } from 'lucide-react'
 
 export default function Hero() {
   return (
@@ -52,7 +53,7 @@ export default function Hero() {
             <div>
               <div className="flex gap-0.5 mb-0.5">
                 {[1,2,3,4,5].map(i => (
-                  <span key={i} className="text-amber-400 text-sm">★</span>
+                  <Star key={i} size={16} className="text-amber-400 fill-amber-400" />
                 ))}
               </div>
               <span className="text-sm text-slate-500">
@@ -104,7 +105,7 @@ export default function Hero() {
           </div>
 
           <div className="absolute -bottom-5 -left-5 bg-white rounded-xl px-4 py-3 shadow-xl border border-slate-100 flex items-center gap-2.5">
-            <div className="text-2xl">⚡</div>
+            <Zap size={24} className="text-amber-500" />
             <div>
               <div className="font-sora text-base font-bold text-slate-900">3 días</div>
               <div className="text-xs text-slate-400">Tiempo prom. de match</div>

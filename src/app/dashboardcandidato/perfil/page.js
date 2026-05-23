@@ -93,6 +93,8 @@ export default function PerfilPage() {
     connections: 0,
     profileViews: 0,
     searchAppearances: 0,
+    languages: [],
+    certifications: [],
   }
 
   if (editando) {
@@ -154,12 +156,16 @@ export default function PerfilPage() {
                 <CardTitle className="text-sm font-semibold">Languages</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
-                {profileData.languages.map((lang, i) => (
-                  <div key={i} className="flex justify-between text-sm">
-                    <span className="text-slate-900">{lang.name}</span>
-                    <span className="text-slate-500">{lang.level}</span>
-                  </div>
-                ))}
+                {profileData.languages && profileData.languages.length > 0 ? (
+                  profileData.languages.map((lang, i) => (
+                    <div key={i} className="flex justify-between text-sm">
+                      <span className="text-slate-900">{lang.name}</span>
+                      <span className="text-slate-500">{lang.level}</span>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-slate-400 italic">No hay idiomas agregados</p>
+                )}
               </CardContent>
             </Card>
           </aside>
@@ -178,7 +184,7 @@ export default function PerfilPage() {
                     <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-100 overflow-hidden">
                       <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
                         <span className="text-4xl font-bold text-blue-600">
-                          {profileData.name.split(' ').map(n => n[0]).join('').slice(0, 2)}
+                          {(profileData.name || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
                         </span>
                       </div>
                     </div>
@@ -250,20 +256,24 @@ export default function PerfilPage() {
                     </Button>
                   </CardHeader>
                   <CardContent className="space-y-3">
-                    {profileData.certifications.map((cert, i) => (
-                      <div key={i} className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
-                          <Award className="h-5 w-5 text-amber-600" />
+                    {profileData.certifications && profileData.certifications.length > 0 ? (
+                      profileData.certifications.map((cert, i) => (
+                        <div key={i} className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center">
+                            <Award className="h-5 w-5 text-amber-600" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-slate-900">{cert.name}</p>
+                            <p className="text-xs text-slate-500">{cert.issuer} · {cert.year}</p>
+                          </div>
+                          <Button variant="ghost" size="icon">
+                            <ExternalLink className="h-4 w-4 text-slate-500" />
+                          </Button>
                         </div>
-                        <div className="flex-1">
-                          <p className="text-sm font-medium text-slate-900">{cert.name}</p>
-                          <p className="text-xs text-slate-500">{cert.issuer} · {cert.year}</p>
-                        </div>
-                        <Button variant="ghost" size="icon">
-                          <ExternalLink className="h-4 w-4 text-slate-500" />
-                        </Button>
-                      </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-sm text-slate-400 italic">No hay certificaciones</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -277,7 +287,7 @@ export default function PerfilPage() {
                     </Button>
                   </CardHeader>
                   <CardContent className="space-y-6">
-                    {profileData.experience.map((exp) => (
+                    {profileData.experience && profileData.experience.length > 0 ? profileData.experience.map((exp) => (
                       <div key={exp.id} className="flex gap-4">
                         <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
                           <Building2 className="h-6 w-6 text-slate-500" />
@@ -289,7 +299,9 @@ export default function PerfilPage() {
                           <p className="text-sm text-slate-600 mt-2">{exp.description}</p>
                         </div>
                       </div>
-                    ))}
+                    )) : (
+                      <p className="text-sm text-slate-400 italic">No hay experiencia laboral</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -304,13 +316,17 @@ export default function PerfilPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
-                      {profileData.skills.map((skill) => (
-                        <SkillTag 
-                          key={skill.name} 
-                          skill={skill.name} 
-                          endorsements={skill.endorsements}
-                        />
-                      ))}
+                      {profileData.skills && profileData.skills.length > 0 ? (
+                        profileData.skills.map((skill) => (
+                          <SkillTag 
+                            key={skill.name} 
+                            skill={skill.name} 
+                            endorsements={skill.endorsements}
+                          />
+                        ))
+                      ) : (
+                        <p className="text-sm text-slate-400 italic">No hay habilidades</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -325,8 +341,9 @@ export default function PerfilPage() {
                     </Button>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {profileData.education.map((edu) => (
-                      <div key={edu.id} className="flex gap-4">
+                    {profileData.education && profileData.education.length > 0 ? (
+                      profileData.education.map((edu) => (
+                        <div key={edu.id} className="flex gap-4">
                         <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
                           <GraduationCap className="h-6 w-6 text-slate-500" />
                         </div>
@@ -337,7 +354,10 @@ export default function PerfilPage() {
                           <p className="text-sm text-slate-600 mt-1">{edu.description}</p>
                         </div>
                       </div>
-                    ))}
+                      ))
+                    ) : (
+                      <p className="text-sm text-slate-400 italic">No hay educación agregada</p>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
