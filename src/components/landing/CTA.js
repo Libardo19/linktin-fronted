@@ -2,6 +2,7 @@
 
     import Link from 'next/link'
     import { useEffect, useRef, useState } from 'react'
+    import { Lock, Zap, CheckCircle2 } from 'lucide-react'
 
     function useInView(threshold = 0.15) {
     const ref = useRef(null)
@@ -45,8 +46,15 @@
             </div>
 
             <div className="flex justify-center gap-8 flex-wrap">
-            {['🔒 Sin tarjeta requerida', '⚡ Setup en 2 minutos', '✅ Gratis para candidatos'].map((badge) => (
-                <span key={badge} className="text-sm text-slate-500">{badge}</span>
+            {[
+                { icon: <Lock size={14} />, text: 'Sin tarjeta requerida' },
+                { icon: <Zap size={14} />, text: 'Setup en 2 minutos' },
+                { icon: <CheckCircle2 size={14} />, text: 'Gratis para candidatos' },
+            ].map((badge) => (
+                <span key={badge.text} className="text-sm text-slate-500 flex items-center gap-1.5">
+                    {badge.icon}
+                    {badge.text}
+                </span>
             ))}
             </div>
         </div>

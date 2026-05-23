@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { Brain, BarChart3, MessageCircle, Search, CheckCircle2, Rocket } from 'lucide-react'
 
 function useInView(threshold = 0.15) {
   const ref = useRef(null)
@@ -14,12 +15,12 @@ function useInView(threshold = 0.15) {
 }
 
 const features = [
-  { icon: '🧠', title: 'Matching por Habilidades', desc: 'Olvídate de las búsquedas manuales infinitas. Nuestro sistema conecta tus habilidades específicas con las necesidades reales de las empresas.' },
-  { icon: '📊', title: 'Puntuación de Compatibilidad', desc: 'Visualiza tu nivel de afinidad con cada oferta de trabajo mediante puntuaciones dinámicas basadas en experiencia y aptitudes técnicas.' },
-  { icon: '💬', title: 'Mensajería en Tiempo Real', desc: 'Comunicación fluida y directa. Conecta con reclutadores y líderes de equipo al instante sin fricciones innecesarias.' },
-  { icon: '🔍', title: 'Búsqueda Avanzada con IA', desc: 'Filtros inteligentes que aprenden de tus preferencias. Cuanto más usas LinkTin, mejores son las recomendaciones.' },
-  { icon: '✅', title: 'Reputación Verificada', desc: 'Perfiles con validación técnica, feedback 360° y historial transparente de logros para generar confianza real.' },
-  { icon: '🚀', title: 'Onboarding Exprés', desc: 'En menos de 5 minutos tu perfil está listo. Nuestro asistente IA te guía paso a paso para maximizar tu visibilidad.' },
+  { icon: <Brain size={24} />, title: 'Matching por Habilidades', desc: 'Olvídate de las búsquedas manuales infinitas. Nuestro sistema conecta tus habilidades específicas con las necesidades reales de las empresas.' },
+  { icon: <BarChart3 size={24} />, title: 'Puntuación de Compatibilidad', desc: 'Visualiza tu nivel de afinidad con cada oferta de trabajo mediante puntuaciones dinámicas basadas en experiencia y aptitudes técnicas.' },
+  { icon: <MessageCircle size={24} />, title: 'Mensajería en Tiempo Real', desc: 'Comunicación fluida y directa. Conecta con reclutadores y líderes de equipo al instante sin fricciones innecesarias.' },
+  { icon: <Search size={24} />, title: 'Búsqueda Avanzada con IA', desc: 'Filtros inteligentes que aprenden de tus preferencias. Cuanto más usas LinkTin, mejores son las recomendaciones.' },
+  { icon: <CheckCircle2 size={24} />, title: 'Reputación Verificada', desc: 'Perfiles con validación técnica, feedback 360° y historial transparente de logros para generar confianza real.' },
+  { icon: <Rocket size={24} />, title: 'Onboarding Exprés', desc: 'En menos de 5 minutos tu perfil está listo. Nuestro asistente IA te guía paso a paso para maximizar tu visibilidad.' },
 ]
 
 function FeatureCard({ feature, delay }) {

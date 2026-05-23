@@ -1,102 +1,100 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { GlobalNavigation } from '@/components/linktin/Navigation'
 import { MatchCard } from '@/components/linktin/MatchCard'
 import { MatchActions } from '@/components/linktin/MatchActions'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { SlidersHorizontal, Building2, Sparkles } from 'lucide-react'
-
-const jobMatches = [
-  {
-    id: 1,
-    companyName: 'TechCorp',
-    isVerified: true,
-    jobTitle: 'Frontend Developer',
-    location: 'Bogotá, Colombia',
-    locationType: 'Remote',
-    salaryRange: '$2,500 - $4,000',
-    matchPercentage: 91,
-    description: 'Join our innovative team to build cutting-edge web applications using React and modern technologies.',
-    requiredSkills: ['React', 'TypeScript', 'Node.js', 'Git'],
-    matchingSkills: ['React', 'Git'],
-  },
-  {
-    id: 2,
-    companyName: 'DataFlow Inc',
-    isVerified: true,
-    jobTitle: 'Full Stack Developer',
-    location: 'Medellín, Colombia',
-    locationType: 'Hybrid',
-    salaryRange: '$3,000 - $5,000',
-    matchPercentage: 87,
-    description: 'We are looking for a talented developer to help us scale our data processing platform.',
-    requiredSkills: ['Python', 'React', 'PostgreSQL', 'AWS'],
-    matchingSkills: ['Python', 'React'],
-  },
-  {
-    id: 3,
-    companyName: 'StartupX',
-    isVerified: false,
-    jobTitle: 'Junior Developer',
-    location: 'Remote',
-    locationType: 'Remote',
-    salaryRange: '$1,500 - $2,500',
-    matchPercentage: 78,
-    description: 'Great opportunity for a junior developer to learn and grow with a fast-paced startup.',
-    requiredSkills: ['JavaScript', 'React', 'SQL'],
-    matchingSkills: ['JavaScript', 'React', 'SQL'],
-  },
-]
-
-const matchedCompanies = [
-  { id: 1, name: 'Google', hasUnread: true },
-  { id: 2, name: 'Meta', hasUnread: false },
-  { id: 3, name: 'Amazon', hasUnread: true },
-  { id: 4, name: 'Microsoft', hasUnread: false },
-  { id: 5, name: 'Apple', hasUnread: false },
-]
+import { matchService } from '@/services/match.service'
 
 export default function MatchesPage() {
+  const [postulaciones, setPostulaciones] = useState([])
+  const [misMatches, setMisMatches] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [swipeDirection, setSwipeDirection] = useState(null)
-  const [remainingMatches, setRemainingMatches] = useState(10)
 
-  const currentJob = jobMatches[currentIndex]
-  const nextJob = jobMatches[currentIndex + 1]
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [postulacionesData, matchesData] = await Promise.all([
+          matchService.feedCandidato(),
+          matchService.misMatches(),
+        ])
+        setPostulaciones(postulacionesData)
+        setMisMatches(matchesData)
+      } catch (err) {
+        setError('Error al cargar matches')
+        console.error(err)
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [])
 
-  const handlePass = () => {
+  const handlePass = async () => {
+    const current = postulaciones[currentIndex]
+    if (!current) return
+
     setSwipeDirection('left')
+    try {
+      await matchService.retirarLike(current.id_match)
+    } catch (err) {
+      console.error('Error al retirar like:', err)
+    }
     setTimeout(() => {
       setSwipeDirection(null)
-      if (currentIndex < jobMatches.length - 1) {
-        setCurrentIndex(currentIndex + 1)
-        setRemainingMatches(remainingMatches - 1)
-      }
+      setCurrentIndex(prev => prev + 1)
     }, 300)
   }
 
-  const handleInterested = () => {
+  const handleInterested = async () => {
+    const current = postulaciones[currentIndex]
+    if (!current) return
+
     setSwipeDirection('right')
     setTimeout(() => {
       setSwipeDirection(null)
-      if (currentIndex < jobMatches.length - 1) {
-        setCurrentIndex(currentIndex + 1)
-        setRemainingMatches(remainingMatches - 1)
-      }
+      setCurrentIndex(prev => prev + 1)
     }, 300)
   }
 
-  const handleSuperApply = () => {
+  const handleSuperApply = async () => {
+    const current = postulaciones[currentIndex]
+    if (!current) return
+
     setSwipeDirection('right')
     setTimeout(() => {
       setSwipeDirection(null)
-      if (currentIndex < jobMatches.length - 1) {
-        setCurrentIndex(currentIndex + 1)
-        setRemainingMatches(remainingMatches - 1)
-      }
+      setCurrentIndex(prev => prev + 1)
     }, 300)
+  }
+
+  const remainingMatches = postulaciones.length - currentIndex
+  const currentJob = postulaciones[currentIndex]
+  const nextJob = postulaciones[currentIndex + 1]
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-500 mb-4">{error}</p>
+          <Button onClick={() => window.location.reload()}>Reintentar</Button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -121,7 +119,17 @@ export default function MatchesPage() {
               <>
                 <div className="absolute inset-x-4 top-4 h-full">
                   <MatchCard
-                    {...nextJob}
+                    id={nextJob.id_match}
+                    companyName={nextJob.oferta?.perfil_empresa?.nombre || 'Empresa'}
+                    isVerified={true}
+                    jobTitle={nextJob.oferta?.titulo || 'Oferta'}
+                    location={nextJob.oferta?.direccion || 'No especificada'}
+                    locationType={nextJob.oferta?.modalidad || 'No especificada'}
+                    salaryRange={nextJob.oferta?.pago ? `$${nextJob.oferta.pago}` : 'A convenir'}
+                    matchPercentage={Math.round(nextJob.compatibilidad)}
+                    description={nextJob.oferta?.descripcion || ''}
+                    requiredSkills={nextJob.oferta?.habilidades_ofertas?.map(h => h.habilidad?.nombre) || []}
+                    matchingSkills={[]}
                     isTopCard={false}
                   />
                 </div>
@@ -134,7 +142,17 @@ export default function MatchesPage() {
             {currentJob ? (
               <div className="absolute inset-0">
                 <MatchCard
-                  {...currentJob}
+                  id={currentJob.id_match}
+                  companyName={currentJob.oferta?.perfil_empresa?.nombre || 'Empresa'}
+                  isVerified={true}
+                  jobTitle={currentJob.oferta?.titulo || 'Oferta'}
+                  location={currentJob.oferta?.direccion || 'No especificada'}
+                  locationType={currentJob.oferta?.modalidad || 'No especificada'}
+                  salaryRange={currentJob.oferta?.pago ? `$${currentJob.oferta.pago}` : 'A convenir'}
+                  matchPercentage={Math.round(currentJob.compatibilidad)}
+                  description={currentJob.oferta?.descripcion || ''}
+                  requiredSkills={currentJob.oferta?.habilidades_ofertas?.map(h => h.habilidad?.nombre) || []}
+                  matchingSkills={[]}
                   swipeDirection={swipeDirection}
                   isTopCard={true}
                 />
@@ -169,22 +187,21 @@ export default function MatchesPage() {
         <div className="mt-8 border-t border-slate-200 pt-6">
           <h3 className="text-sm font-semibold text-slate-900 mb-4">My Matches</h3>
           <div className="flex items-center gap-4 overflow-x-auto pb-2">
-            {matchedCompanies.map((company) => (
+            {misMatches.length > 0 ? misMatches.map((match) => (
               <button
-                key={company.id}
+                key={match.id_match}
                 className="flex-shrink-0 relative group"
               >
                 <div className="w-16 h-16 rounded-full bg-slate-100 border-2 border-emerald-500 flex items-center justify-center overflow-hidden transition-transform group-hover:scale-105">
                   <Building2 className="h-8 w-8 text-slate-500" />
                 </div>
-                {company.hasUnread && (
-                  <div className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 rounded-full border-2 border-white" />
-                )}
                 <p className="text-xs text-center mt-1 text-slate-500 truncate max-w-16">
-                  {company.name}
+                  {match.oferta?.perfil_empresa?.nombre || 'Empresa'}
                 </p>
               </button>
-            ))}
+            )) : (
+              <p className="text-sm text-slate-400">No tienes matches aún</p>
+            )}
           </div>
         </div>
       </main>
