@@ -1,16 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import { GlobalNavigation } from '@/components/linktin/Navigation'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/Card'
 import { Badge } from '@/components/ui/Badge'
-import { Users, Building2, Heart, Briefcase, TrendingUp, TrendingDown, AlertTriangle, Clock, Activity } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
+import { Users, Building2, Heart, Briefcase, AlertTriangle, Clock } from 'lucide-react'
 import { adminService } from '@/services/admin.service'
 
 export default function DashboardAdminPage() {
   const [stats, setStats] = useState(null)
   const [cargando, setCargando] = useState(true)
   const [error, setError] = useState(null)
+  const [reportesStats, setReportesStats] = useState(null)
+  const [cargandoReportes, setCargandoReportes] = useState(true)
 
   useEffect(() => {
     const cargarStats = async () => {
@@ -27,12 +31,24 @@ export default function DashboardAdminPage() {
     cargarStats()
   }, [])
 
+  useEffect(() => {
+    const cargarReportesStats = async () => {
+      try {
+        const data = await adminService.getDashboardReportes()
+        setReportesStats(data)
+      } catch (err) {
+        console.error(err)
+      } finally {
+        setCargandoReportes(false)
+      }
+    }
+    cargarReportesStats()
+  }, [])
+
   const statsCards = stats ? [
     {
       title: 'Total Candidatos',
       value: stats.totalCandidatos?.toLocaleString() || '0',
-      change: '+12.5%',
-      trend: 'up',
       description: 'candidatos registrados',
       icon: Users,
       bgColor: 'bg-blue-100',
@@ -41,8 +57,6 @@ export default function DashboardAdminPage() {
     {
       title: 'Total Empresas',
       value: stats.totalEmpresas?.toLocaleString() || '0',
-      change: '+8.2%',
-      trend: 'up',
       description: 'empresas registradas',
       icon: Building2,
       bgColor: 'bg-indigo-100',
@@ -51,8 +65,6 @@ export default function DashboardAdminPage() {
     {
       title: 'Matches Exitosos',
       value: stats.matchesExitosos?.toLocaleString() || '0',
-      change: '+23.1%',
-      trend: 'up',
       description: 'matches aceptados',
       icon: Heart,
       bgColor: 'bg-rose-100',
@@ -61,8 +73,6 @@ export default function DashboardAdminPage() {
     {
       title: 'Ofertas Activas',
       value: stats.ofertasActivas?.toLocaleString() || '0',
-      change: '-3.2%',
-      trend: 'down',
       description: 'ofertas publicadas',
       icon: Briefcase,
       bgColor: 'bg-amber-100',
@@ -101,7 +111,6 @@ export default function DashboardAdminPage() {
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
               {statsCards.map((stat) => {
                 const Icon = stat.icon
-                const TrendIcon = stat.trend === 'up' ? TrendingUp : TrendingDown
                 return (
                   <Card key={stat.title}>
                     <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -114,21 +123,7 @@ export default function DashboardAdminPage() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-2xl font-bold text-slate-900">{stat.value}</div>
-                      <div className="flex items-center gap-1 text-xs mt-1">
-                        <TrendIcon
-                          className={`h-3 w-3 ${
-                            stat.trend === 'up' ? 'text-emerald-500' : 'text-red-500'
-                          }`}
-                        />
-                        <span
-                          className={
-                            stat.trend === 'up' ? 'text-emerald-500' : 'text-red-500'
-                          }
-                        >
-                          {stat.change}
-                        </span>
-                        <span className="text-slate-400">{stat.description}</span>
-                      </div>
+                      <p className="text-xs text-slate-400 mt-1">{stat.description}</p>
                     </CardContent>
                   </Card>
                 )
@@ -164,17 +159,45 @@ export default function DashboardAdminPage() {
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 text-lg">
-                    <AlertTriangle className="h-5 w-5 text-red-500" />
-                    Reportes Pendientes
-                  </CardTitle>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="flex items-center gap-2 text-lg">
+                      <AlertTriangle className="h-5 w-5 text-red-500" />
+                      Reportes Pendientes
+                    </CardTitle>
+                    <Link href="/dashboardadmin/reportes">
+                      <Button variant="ghost" size="sm">Ver todos</Button>
+                    </Link>
+                  </div>
                   <CardDescription>Requieren atención</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm text-slate-400 text-center py-4">
-                    Módulo de reportes próximamente
-                  </p>
+                  {cargandoReportes ? (
+                    <div className="flex justify-center py-4">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600" />
+                    </div>
+                  ) : reportesStats ? (
+                    <div className="space-y-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-slate-600">Pendientes</span>
+                        <span className="text-2xl font-bold text-amber-600">{reportesStats.pendiente}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-slate-600">En revisión</span>
+                        <span className="text-2xl font-bold text-blue-600">{reportesStats.en_revision}</span>
+                      </div>
+                      <div className="flex items-center justify-between pt-2 border-t border-slate-100">
+                        <span className="text-sm text-slate-600">Resueltos</span>
+                        <span className="text-lg font-semibold text-emerald-600">{reportesStats.resuelto}</span>
+                      </div>
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-slate-600">Descartados</span>
+                        <span className="text-lg font-semibold text-slate-500">{reportesStats.descartado}</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-400 text-center py-4">Sin datos</p>
+                  )}
                 </CardContent>
               </Card>
             </div>
