@@ -37,22 +37,35 @@
     const login = async ({ email, password }) => {
         const data = await loginService({ email, password })
         setUsuario(data.usuario)
-        // ← cuando tengas el dashboard, cambia esto a router.push('/dashboard')
-        router.push('/') 
+        // Redirección según tipo de usuario (incluye admin)
+        if (data.usuario.tipo === 'admin') {
+            router.push('/dashboardadmin')
+        } else if (data.usuario.tipo === 'empresa') {
+            router.push('/dashboardempresa')
+        } else {
+            router.push('/dashboardcandidato')
+        }
         return data
     }
 
     const register = async (formData) => {
         const data = await registerService(formData)
         setUsuario(data.usuario)
-        router.push('/')
+        // Redirección según tipo de usuario (incluye admin)
+        if (data.usuario.tipo === 'admin') {
+            router.push('/dashboardadmin')
+        } else if (data.usuario.tipo === 'empresa') {
+            router.push('/dashboardempresa')
+        } else {
+            router.push('/dashboardcandidato')
+        }
         return data
     }
 
     const logout = () => {
         logoutService()
         setUsuario(null)
-        router.push('/auth/login')
+        router.replace('/')
     }
 
     return (
