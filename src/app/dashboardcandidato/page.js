@@ -14,20 +14,6 @@ import { candidatoService } from '@/services/candidato.service'
 import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
 
-const suggestedSkills = ['TypeScript', 'Node.js', 'Docker', 'AWS']
-
-const peopleViewed = [
-  { name: 'Maria García', title: 'Frontend Developer at Google' },
-  { name: 'Carlos Ruiz', title: 'Software Engineer at Microsoft' },
-  { name: 'Ana López', title: 'Full Stack Developer' },
-]
-
-const suggestedCompanies = [
-  { name: 'Rappi', followers: '150K' },
-  { name: 'MercadoLibre', followers: '500K' },
-  { name: 'Globant', followers: '300K' },
-]
-
 export default function CandidatoDashboardPage() {
   const { usuario } = useAuth()
   const [perfil, setPerfil] = useState(null)
@@ -300,15 +286,7 @@ export default function CandidatoDashboardPage() {
                   </Button>
                 )}
 
-                <div className="pt-4 border-t border-slate-100">
-                  <p className="text-xs text-slate-500 mb-2">Suggested skills</p>
-                  <div className="flex flex-wrap gap-2">
-                    {suggestedSkills.map((skill) => (
-                      <SkillTag key={skill} skill={skill} variant="suggested" />
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
+                </CardContent>
             </Card>
 
             {/* EXPERIENCE */}
@@ -475,19 +453,7 @@ export default function CandidatoDashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {peopleViewed.map((person, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
-                      <span className="text-xs font-medium text-slate-500">
-                        {person.name.split(' ').map(n => n[0]).join('')}
-                      </span>
-                    </div>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-900 truncate">{person.name}</p>
-                      <p className="text-xs text-slate-500 truncate">{person.title}</p>
-                    </div>
-                  </div>
-                ))}
+                <p className="text-sm text-slate-400 italic">No hay datos disponibles</p>
               </CardContent>
             </Card>
 
@@ -499,22 +465,7 @@ export default function CandidatoDashboardPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {suggestedCompanies.map((company, i) => (
-                  <div key={i} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center">
-                        <Building2 className="h-4 w-4 text-slate-500" />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-slate-900">{company.name}</p>
-                        <p className="text-xs text-slate-500">{company.followers} followers</p>
-                      </div>
-                    </div>
-                    <Button variant="outline" size="sm" className="h-7 text-xs">
-                      Follow
-                    </Button>
-                  </div>
-                ))}
+                <p className="text-sm text-slate-400 italic">No hay datos disponibles</p>
               </CardContent>
             </Card>
           </aside>

@@ -114,8 +114,10 @@ export function GlobalNavigation({ activeTab = 'home', notificationCount = 0, ty
           {/* Right Side */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <Avatar fallback="LJ" className="h-8 w-8" />
-              <span className="hidden lg:block text-sm font-medium text-slate-700">Libardo J.</span>
+              <Avatar fallback={usuario?.email ? usuario.email[0].toUpperCase() : 'U'} className="h-8 w-8" />
+              <span className="hidden lg:block text-sm font-medium text-slate-700">
+                {usuario?.email || 'Usuario'}
+              </span>
             </div>
             <button 
               className="p-2 rounded-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100"

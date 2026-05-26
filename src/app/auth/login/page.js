@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useAuth } from '../../../context/AuthContext'
+import { Sparkles, X, Heart, Check } from 'lucide-react'
 
 function GoogleIcon() {
   return (
@@ -74,8 +75,8 @@ function LeftPanel() {
             <div className="text-xs text-slate-400">UX/UI Designer</div>
           </div>
           <div className="absolute bg-[#0D1B2A] w-56 left-0 top-0 border border-blue-500/40 rounded-2xl p-4 z-30 shadow-xl">
-            <div className="absolute -top-2 -right-2 z-40 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full px-3 py-1 font-sora font-bold text-xs text-white shadow-lg">
-              ✦ MATCH
+            <div className="absolute -top-2 -right-2 z-40 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-full px-3 py-1 font-sora font-bold text-xs text-white shadow-lg flex items-center gap-1">
+              <Sparkles size={12} /> MATCH
             </div>
             <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-blue-400 flex items-center justify-center mb-2 font-sora font-bold text-sm text-white">LA</div>
             <div className="font-sora font-bold text-sm text-white mb-1">Libardo Acosta</div>
@@ -89,8 +90,8 @@ function LeftPanel() {
         </div>
 
         <div className="flex items-center gap-3 mb-5 relative z-10">
-          <button className="w-10 h-10 rounded-full bg-red-500/20 border border-red-500/30 text-red-500 flex items-center justify-center hover:bg-red-500/30 transition">✕</button>
-          <button className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-500 flex items-center justify-center hover:bg-emerald-500/30 transition">♥</button>
+          <button className="w-10 h-10 rounded-full bg-red-500/20 border border-red-500/30 text-red-500 flex items-center justify-center hover:bg-red-500/30 transition"><X size={16} /></button>
+          <button className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-500 flex items-center justify-center hover:bg-emerald-500/30 transition"><Heart size={16} /></button>
           <span className="text-xs text-slate-400">Descubrir empresas / candidatos</span>
         </div>
 
@@ -177,7 +178,7 @@ export default function LoginPage() {
                   className="w-full px-4 py-3 rounded-lg bg-slate-50 border border-slate-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none transition text-sm"
                 />
                 {email && (
-                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 text-sm">✓</span>
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-emerald-500 text-sm"><Check size={16} /></span>
                 )}
               </div>
             </div>
@@ -211,7 +212,7 @@ export default function LoginPage() {
                 <div className={`w-4 h-4 rounded flex items-center justify-center text-xs transition ${
                   remember ? 'bg-blue-600 text-white' : 'border-2 border-slate-300'
                 }`}>
-                  {remember && '✓'}
+                  {remember && <Check size={12} />}
                 </div>
                 <span className="text-sm">Recordarme</span>
               </button>
