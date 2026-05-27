@@ -182,21 +182,21 @@ export default function EmpresaDashboardPage() {
             {/* Welcome Banner */}
             <Card className="bg-gradient-to-r from-blue-600 to-blue-800 text-white border-0">
               <CardContent className="p-6">
-                <h1 className="text-xl font-bold">Welcome back, {perfil?.nombre || 'Empresa'}</h1>
+                <h1 className="text-xl font-bold">Bienvenido de nuevo, {perfil?.nombre || 'Empresa'}</h1>
                 <p className="mt-1 text-blue-100 text-sm">
-                  You have {candidatos.length} new candidate matches to review
+                  Tienes {candidatos.length} nuevos candidatos para revisar
                 </p>
                 <div className="mt-4 flex flex-wrap gap-3">
                   <Link href="/dashboardempresa/ofertas/nueva">
                     <Button className="bg-white text-blue-600 hover:bg-blue-50">
                       <Plus className="h-4 w-4 mr-2" />
-                      Post New Job
+                      Publicar Nueva Oferta
                     </Button>
                   </Link>
                   <Link href="/dashboardempresa/matches">
                     <Button variant="outline" className="border-white text-white hover:bg-white/10 bg-transparent">
                       <Target className="h-4 w-4 mr-2" />
-                      View Matches
+                      Ver Matches
                     </Button>
                   </Link>
                 </div>
@@ -214,7 +214,7 @@ export default function EmpresaDashboardPage() {
                     <span className="text-xs text-blue-600 font-medium">+{Math.round(totalViews * 0.12)}%</span>
                   </div>
                   <p className="mt-2 text-2xl font-bold text-slate-900">{totalViews}</p>
-                  <p className="text-sm text-slate-500">Profile Views</p>
+                  <p className="text-sm text-slate-500">Vistas de Perfil</p>
                 </CardContent>
               </Card>
               <Card>
@@ -223,10 +223,10 @@ export default function EmpresaDashboardPage() {
                     <div className="p-2 rounded-lg bg-green-50">
                       <Users className="h-4 w-4 text-green-600" />
                     </div>
-                    <span className="text-xs text-green-600 font-medium">{candidatos.length} new</span>
+                    <span className="text-xs text-green-600 font-medium">{candidatos.length} nuevos</span>
                   </div>
                   <p className="mt-2 text-2xl font-bold text-slate-900">{totalApplications}</p>
-                  <p className="text-sm text-slate-500">Applications</p>
+                  <p className="text-sm text-slate-500">Postulaciones</p>
                 </CardContent>
               </Card>
               <Card>
@@ -237,7 +237,7 @@ export default function EmpresaDashboardPage() {
                     </div>
                   </div>
                   <p className="mt-2 text-2xl font-bold text-slate-900">{activeOfertas.length}</p>
-                  <p className="text-sm text-slate-500">Active Jobs</p>
+                  <p className="text-sm text-slate-500">Ofertas Activas</p>
                 </CardContent>
               </Card>
               <Card>
@@ -259,10 +259,10 @@ export default function EmpresaDashboardPage() {
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <CardTitle className="text-lg font-semibold flex items-center gap-2">
                     <Target className="h-5 w-5 text-blue-600" />
-                    Candidate Matching
+                    Matching de Candidatos
                   </CardTitle>
                   <Badge variant="secondary" className="text-xs">
-                    {candidatos.length - currentCandidateIndex} remaining
+                    {candidatos.length - currentCandidateIndex} restantes
                   </Badge>
                 </CardHeader>
                 <CardContent>
@@ -284,9 +284,9 @@ export default function EmpresaDashboardPage() {
                       ) : (
                         <div className="absolute inset-0 flex flex-col items-center justify-center bg-white rounded-lg shadow-lg">
                           <Users className="h-12 w-12 text-slate-400 mb-3" />
-                          <h3 className="text-base font-semibold text-slate-900">All caught up!</h3>
+                          <h3 className="text-base font-semibold text-slate-900">¡Todo al día!</h3>
                           <p className="text-sm text-slate-500 text-center mt-2 px-6">
-                            You&apos;ve reviewed all matching candidates
+                            Has revisado todos los candidatos
                           </p>
                         </div>
                       )}
@@ -307,10 +307,10 @@ export default function EmpresaDashboardPage() {
             {/* Hiring Pipeline */}
             <Card>
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <CardTitle className="text-lg font-semibold">Hiring Pipeline</CardTitle>
+                <CardTitle className="text-lg font-semibold">Pipeline de Contratación</CardTitle>
                 <Link href="/dashboardempresa/matches">
                   <Button variant="ghost" size="sm" className="text-blue-600">
-                    View All <ChevronRight className="h-3 w-3 ml-1" />
+                    Ver Todo <ChevronRight className="h-3 w-3 ml-1" />
                   </Button>
                 </Link>
               </CardHeader>
@@ -318,7 +318,7 @@ export default function EmpresaDashboardPage() {
                 <div className="flex items-center gap-4">
                   <div className="flex-1 bg-slate-50 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-sm font-medium text-slate-700">New Matches</h4>
+                      <h4 className="text-sm font-medium text-slate-700">Nuevos Matches</h4>
                       <span className="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
                         {pipeline.newMatches.length}
                       </span>
@@ -334,13 +334,13 @@ export default function EmpresaDashboardPage() {
                         </div>
                       ))}
                       {pipeline.newMatches.length === 0 && (
-                        <p className="text-xs text-slate-400 text-center py-2">No new matches</p>
+                        <p className="text-xs text-slate-400 text-center py-2">Sin nuevos matches</p>
                       )}
                     </div>
                   </div>
                   <div className="flex-1 bg-slate-50 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-sm font-medium text-slate-700">In Review</h4>
+                      <h4 className="text-sm font-medium text-slate-700">En Revisión</h4>
                       <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
                         {pipeline.inReview.length}
                       </span>
@@ -356,13 +356,13 @@ export default function EmpresaDashboardPage() {
                         </div>
                       ))}
                       {pipeline.inReview.length === 0 && (
-                        <p className="text-xs text-slate-400 text-center py-2">None in review</p>
+                        <p className="text-xs text-slate-400 text-center py-2">Ninguno en revisión</p>
                       )}
                     </div>
                   </div>
                   <div className="flex-1 bg-slate-50 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-sm font-medium text-slate-700">Interview</h4>
+                      <h4 className="text-sm font-medium text-slate-700">Entrevista</h4>
                       <span className="text-xs font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full">
                         {pipeline.interview.length}
                       </span>
@@ -378,7 +378,7 @@ export default function EmpresaDashboardPage() {
                         </div>
                       ))}
                       {pipeline.interview.length === 0 && (
-                        <p className="text-xs text-slate-400 text-center py-2">No interviews</p>
+                        <p className="text-xs text-slate-400 text-center py-2">Sin entrevistas</p>
                       )}
                     </div>
                   </div>
@@ -391,7 +391,7 @@ export default function EmpresaDashboardPage() {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <CardTitle className="text-lg font-semibold flex items-center gap-2">
                   <Briefcase className="h-5 w-5 text-blue-600" />
-                  Job Posts
+                  Ofertas de Trabajo
                 </CardTitle>
                 <Link href="/dashboardempresa/ofertas">
                   <Button variant="ghost" size="sm" className="text-blue-600">
@@ -410,9 +410,9 @@ export default function EmpresaDashboardPage() {
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs text-slate-500">{oferta.postulaciones?.length || 0} apps</span>
+                        <span className="text-xs text-slate-500">{oferta.postulaciones?.length || 0} post.</span>
                         <Badge variant={oferta.estado === 'activa' ? 'success' : 'secondary'} className="text-[10px] px-2">
-                          {oferta.estado === 'activa' ? 'Active' : oferta.estado}
+                          {oferta.estado === 'activa' ? 'Activa' : oferta.estado}
                         </Badge>
                       </div>
                     </div>
@@ -420,11 +420,11 @@ export default function EmpresaDashboardPage() {
                   {ofertas.length === 0 && (
                     <div className="text-center py-4">
                       <Building2 className="h-8 w-8 text-slate-300 mx-auto mb-2" />
-                      <p className="text-sm text-slate-500">No job posts yet</p>
+                      <p className="text-sm text-slate-500">Aún no hay ofertas</p>
                       <Link href="/dashboardempresa/ofertas/nueva">
                         <Button size="sm" className="mt-2">
                           <Plus className="h-4 w-4 mr-1" />
-                          Create First Job
+                          Crear Primera Oferta
                         </Button>
                       </Link>
                     </div>
@@ -440,12 +440,12 @@ export default function EmpresaDashboardPage() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Eye className="h-4 w-4 text-blue-600" />
-                  Profile Views
+                  Vistas de Perfil
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-3xl font-bold text-slate-900">{totalViews}</p>
-                <p className="text-xs text-slate-500 mt-1">views this week</p>
+                <p className="text-xs text-slate-500 mt-1">vistas esta semana</p>
                 <div className="mt-3 flex items-end justify-between h-16 gap-1">
                   {[40, 65, 45, 80, 55, 90, 75].map((height, i) => (
                     <div
@@ -465,7 +465,7 @@ export default function EmpresaDashboardPage() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <TrendingUp className="h-4 w-4 text-blue-600" />
-                  Skills Overview
+                  Resumen de Habilidades
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
@@ -485,7 +485,7 @@ export default function EmpresaDashboardPage() {
               <CardHeader className="pb-2">
                 <CardTitle className="text-sm font-medium flex items-center gap-2">
                   <Heart className="h-4 w-4 text-blue-600" />
-                  Match Rate
+                  Tasa de Match
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -502,7 +502,7 @@ export default function EmpresaDashboardPage() {
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
                       <span className="text-2xl font-bold text-slate-900">{matchRate}%</span>
-                      <span className="text-[10px] text-slate-500">match rate</span>
+                      <span className="text-[10px] text-slate-500">tasa de match</span>
                     </div>
                   </div>
                 </div>
@@ -512,7 +512,7 @@ export default function EmpresaDashboardPage() {
             <Link href="/dashboardempresa/ofertas/nueva">
               <Button className="w-full gap-2">
                 <Plus className="h-4 w-4" />
-                Post New Job
+                Publicar Oferta
               </Button>
             </Link>
           </aside>

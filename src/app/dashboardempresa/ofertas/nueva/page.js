@@ -76,7 +76,9 @@ export default function NuevaOfertaPage() {
       })
       router.push('/dashboardempresa/ofertas')
     } catch (err) {
-      setError(err.response?.data?.message || 'Error al crear la oferta')
+      const msg = err.response?.data?.message || 'Error al crear la oferta'
+      const detalles = err.response?.data?.errors
+      setError(detalles ? `${msg}: ${detalles.join(', ')}` : msg)
     } finally {
       setSubmitting(false)
     }
@@ -105,8 +107,8 @@ export default function NuevaOfertaPage() {
           <div className="col-span-9 space-y-6">
             {/* Header */}
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">Post New Job</h1>
-              <p className="text-sm text-slate-500 mt-1">Create a new job posting to attract candidates</p>
+              <h1 className="text-2xl font-bold text-slate-900">Publicar Nueva Oferta</h1>
+              <p className="text-sm text-slate-500 mt-1">Crea una nueva oferta de trabajo para atraer candidatos</p>
             </div>
 
             {error && (
@@ -121,14 +123,14 @@ export default function NuevaOfertaPage() {
               {/* Basic Info */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Basic Information</CardTitle>
+                  <CardTitle className="text-lg">Información Básica</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="title">Job Title *</Label>
+                    <Label htmlFor="title">Título del Puesto *</Label>
                     <Input
                       id="title"
-                      placeholder="e.g., Frontend Developer"
+                      placeholder="Ej: Desarrollador Frontend"
                       value={form.titulo}
                       onChange={(e) => setForm({ ...form, titulo: e.target.value })}
                       required
@@ -136,10 +138,10 @@ export default function NuevaOfertaPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="description">Job Description *</Label>
+                    <Label htmlFor="description">Descripción del Puesto *</Label>
                     <Textarea
                       id="description"
-                      placeholder="Describe the role, responsibilities, and requirements..."
+                      placeholder="Describe el rol, responsabilidades y requisitos..."
                       rows={6}
                       value={form.descripcion}
                       onChange={(e) => setForm({ ...form, descripcion: e.target.value })}
@@ -148,10 +150,10 @@ export default function NuevaOfertaPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="requirements">Requirements</Label>
+                    <Label htmlFor="requirements">Requisitos</Label>
                     <Textarea
                       id="requirements"
-                      placeholder="List the required skills and qualifications..."
+                      placeholder="Enumera las habilidades y cualificaciones requeridas..."
                       rows={4}
                       value={form.requisitos}
                       onChange={(e) => setForm({ ...form, requisitos: e.target.value })}
@@ -163,12 +165,12 @@ export default function NuevaOfertaPage() {
               {/* Location & Type */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Location & Employment</CardTitle>
+                  <CardTitle className="text-lg">Ubicación y Empleo</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Location Type</Label>
+                      <Label>Tipo de Ubicación</Label>
                       <select
                         className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={form.modalidad}
@@ -180,7 +182,7 @@ export default function NuevaOfertaPage() {
                       </select>
                     </div>
                     <div className="space-y-2">
-                      <Label>Employment Type</Label>
+                      <Label>Tipo de Empleo</Label>
                       <select
                         className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         value={form.tipo_empleo}
@@ -195,9 +197,9 @@ export default function NuevaOfertaPage() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label>Location</Label>
+                    <Label>Ubicación</Label>
                     <Input
-                      placeholder="e.g., Bogotá, Colombia"
+                      placeholder="Ej: Bogotá, Colombia"
                       value={form.ubicacion}
                       onChange={(e) => setForm({ ...form, ubicacion: e.target.value })}
                     />
@@ -208,12 +210,12 @@ export default function NuevaOfertaPage() {
               {/* Salary */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Salary Range</CardTitle>
+                  <CardTitle className="text-lg">Rango Salarial</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label>Minimum Salary</Label>
+                      <Label>Salario Mínimo</Label>
                       <Input
                         type="number"
                         placeholder="$0"
@@ -222,7 +224,7 @@ export default function NuevaOfertaPage() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label>Maximum Salary</Label>
+                      <Label>Salario Máximo</Label>
                       <Input
                         type="number"
                         placeholder="$0"
@@ -237,13 +239,13 @@ export default function NuevaOfertaPage() {
               {/* Skills */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-lg">Required Skills</CardTitle>
+                  <CardTitle className="text-lg">Habilidades Requeridas</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2">
                     <div className="flex gap-2">
                       <Input
-                        placeholder="Add a skill..."
+                        placeholder="Agregar habilidad..."
                         value={skillInput}
                         onChange={(e) => setSkillInput(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addSkill())}
@@ -265,7 +267,7 @@ export default function NuevaOfertaPage() {
                         </span>
                       ))}
                       {form.skills.length === 0 && (
-                        <p className="text-xs text-slate-400">No skills added yet</p>
+                        <p className="text-xs text-slate-400">Aún no hay habilidades</p>
                       )}
                     </div>
                   </div>
@@ -275,15 +277,15 @@ export default function NuevaOfertaPage() {
               {/* Actions */}
               <div className="flex items-center justify-end gap-3">
                 <Link href="/dashboardempresa/ofertas">
-                  <Button type="button" variant="outline">Cancel</Button>
+                  <Button type="button" variant="outline">Cancelar</Button>
                 </Link>
                 <Button type="submit" disabled={submitting}>
                   {submitting ? (
-                    'Creating...'
+                    'Creando...'
                   ) : (
                     <>
                       <Rocket className="h-4 w-4 mr-2" />
-                      Post Job
+                      Publicar Oferta
                     </>
                   )}
                 </Button>

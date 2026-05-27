@@ -106,15 +106,15 @@ export default function OfertasPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">Job Posts</h1>
+                <h1 className="text-2xl font-bold text-slate-900">Ofertas de Trabajo</h1>
                 <p className="text-sm text-slate-500 mt-1">
-                  {counts.activa} active · {counts.pausada} paused · {counts.cerrada} closed
+                  {counts.activa} activas · {counts.pausada} pausadas · {counts.cerrada} cerradas
                 </p>
               </div>
               <Link href="/dashboardempresa/ofertas/nueva">
                 <Button className="gap-2">
                   <Plus className="h-4 w-4" />
-                  Post New Job
+                        Publicar Oferta
                 </Button>
               </Link>
             </div>
@@ -124,7 +124,7 @@ export default function OfertasPage() {
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <Input
-                  placeholder="Search job posts..."
+                  placeholder="Buscar ofertas..."
                   className="pl-9"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -139,7 +139,7 @@ export default function OfertasPage() {
                     onClick={() => setFilter(status)}
                     className="capitalize"
                   >
-                    {status === 'all' ? 'All' : status} ({counts[status]})
+                    {status === 'all' ? 'Todas' : status === 'activa' ? 'Activas' : status === 'pausada' ? 'Pausadas' : 'Cerradas'} ({counts[status]})
                   </Button>
                 ))}
               </div>
@@ -168,7 +168,7 @@ export default function OfertasPage() {
                             variant={oferta.estado === 'activa' ? 'success' : oferta.estado === 'pausada' ? 'secondary' : 'destructive'}
                             className="text-xs"
                           >
-                            {oferta.estado || 'Unknown'}
+                            {oferta.estado === 'activa' ? 'Activa' : oferta.estado === 'pausada' ? 'Pausada' : oferta.estado === 'cerrada' ? 'Cerrada' : oferta.estado || 'Desconocido'}
                           </Badge>
                         </div>
 
@@ -199,11 +199,11 @@ export default function OfertasPage() {
                       <div className="flex items-center gap-6">
                         <div className="text-center">
                           <p className="text-lg font-semibold text-slate-900">{oferta.vistas || 0}</p>
-                          <p className="text-xs text-slate-500">Views</p>
+                          <p className="text-xs text-slate-500">Vistas</p>
                         </div>
                         <div className="text-center">
                           <p className="text-lg font-semibold text-slate-900">{oferta.postulaciones?.length || 0}</p>
-                          <p className="text-xs text-slate-500">Applications</p>
+                          <p className="text-xs text-slate-500">Postulaciones</p>
                         </div>
                         <div className="text-center">
                           <p className="text-lg font-semibold text-blue-600">0</p>
@@ -242,12 +242,12 @@ export default function OfertasPage() {
                 <Card>
                   <CardContent className="p-8 text-center">
                     <Building2 className="h-12 w-12 text-slate-300 mx-auto mb-3" />
-                    <h3 className="text-base font-semibold text-slate-900">No job posts yet</h3>
-                    <p className="text-sm text-slate-500 mt-1">Create your first job posting</p>
+                    <h3 className="text-base font-semibold text-slate-900">Aún no hay ofertas</h3>
+                    <p className="text-sm text-slate-500 mt-1">Crea tu primera oferta de trabajo</p>
                     <Link href="/dashboardempresa/ofertas/nueva">
                       <Button className="mt-4">
                         <Plus className="h-4 w-4 mr-2" />
-                        Post New Job
+                  Publicar Oferta
                       </Button>
                     </Link>
                   </CardContent>

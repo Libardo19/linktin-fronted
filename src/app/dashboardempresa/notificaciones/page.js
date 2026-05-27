@@ -6,8 +6,9 @@ import { NotificationItem } from '@/components/linktin/NotificationItem'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { notificacionesService } from '@/services/notificaciones.service'
+import { matchService } from '@/services/match.service'
 
-export default function NotificacionesPage() {
+export default function NotificacionesEmpresaPage() {
   const [notificaciones, setNotificaciones] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState('all')
@@ -98,7 +99,7 @@ export default function NotificacionesPage() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <GlobalNavigation activeTab="notifications" notificationCount={unreadCount} type="candidato" />
+      <GlobalNavigation activeTab="notifications" notificationCount={unreadCount} type="empresa" />
 
       <main className="max-w-[800px] mx-auto px-4 py-6 pt-20">
         <h1 className="text-2xl font-bold text-slate-900 mb-6">Notificaciones</h1>

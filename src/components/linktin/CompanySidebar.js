@@ -31,7 +31,7 @@ export function CompanySidebar({
               <Building2 className="h-10 w-10 text-blue-600" />
             </div>
             <Badge className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-[10px]">
-              Verified
+              Verificada
             </Badge>
           </div>
           
@@ -57,15 +57,15 @@ export function CompanySidebar({
             <div className="flex justify-between text-center">
               <div>
                 <p className="text-lg font-semibold text-slate-900">{activeJobPosts}</p>
-                <p className="text-xs text-slate-500">Active Jobs</p>
+                <p className="text-xs text-slate-500">Ofertas Activas</p>
               </div>
               <div>
                 <p className="text-lg font-semibold text-slate-900">{totalCandidates}</p>
-                <p className="text-xs text-slate-500">Candidates</p>
+                <p className="text-xs text-slate-500">Candidatos</p>
               </div>
               <div>
                 <p className="text-lg font-semibold text-blue-600">{newMatches}</p>
-                <p className="text-xs text-slate-500">New Matches</p>
+                <p className="text-xs text-slate-500">Nuevos Matches</p>
               </div>
             </div>
           </div>
@@ -77,13 +77,13 @@ export function CompanySidebar({
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
             <TrendingUp className="h-4 w-4 text-blue-600" />
-            Company Profile
+            Perfil Empresarial
           </div>
           
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
               <span className="text-slate-500">
-                {profileCompletion < 30 ? 'Beginner' : profileCompletion < 60 ? 'Intermediate' : 'Strong'}
+                {profileCompletion < 30 ? 'Principiante' : profileCompletion < 60 ? 'Intermedio' : 'Fuerte'}
               </span>
               <span className="font-semibold text-blue-600">{profileCompletion}%</span>
             </div>
@@ -92,14 +92,14 @@ export function CompanySidebar({
           
           {profileCompletion < 100 && (
             <div className="space-y-1.5 pt-2">
-              <p className="text-xs text-slate-500">Complete these to improve:</p>
+              <p className="text-xs text-slate-500">Completa estos pasos para mejorar:</p>
               <div className="flex items-center gap-2 text-xs">
                 <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                <span className="text-slate-600">Add company logo</span>
+                <span className="text-slate-600">Agrega el logo de la empresa</span>
               </div>
               <div className="flex items-center gap-2 text-xs">
                 <div className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                <span className="text-slate-600">Describe your benefits</span>
+                <span className="text-slate-600">Describe tus beneficios</span>
               </div>
             </div>
           )}
