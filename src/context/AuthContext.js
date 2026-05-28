@@ -37,7 +37,10 @@
     const login = async ({ email, password }) => {
         const data = await loginService({ email, password })
         setUsuario(data.usuario)
-        if (data.usuario.tipo === 'empresa') {
+        // Redirección según tipo de usuario (incluye admin)
+        if (data.usuario.tipo === 'admin') {
+            router.push('/dashboardadmin')
+        } else if (data.usuario.tipo === 'empresa') {
             router.push('/dashboardempresa')
         } else {
             router.push('/dashboardcandidato')
@@ -46,7 +49,17 @@
     }
 
     const register = async (formData) => {
-        await registerService(formData)
+        const data = await registerService(formData)
+        setUsuario(data.usuario)
+        // Redirección según tipo de usuario (incluye admin)
+        if (data.usuario.tipo === 'admin') {
+            router.push('/dashboardadmin')
+        } else if (data.usuario.tipo === 'empresa') {
+            router.push('/dashboardempresa')
+        } else {
+            router.push('/dashboardcandidato')
+        }
+        return data
     }
 
     const logout = () => {

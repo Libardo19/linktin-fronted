@@ -12,7 +12,14 @@ import {
   Building2,
   LogOut,
   Menu,
-  X
+  X,
+  LayoutDashboard,
+  Shield,
+  Flag,       // 🆕 Icono para admin
+  Users,         // 🆕 Icono para usuarios
+  BarChart3,     // 🆕 Icono para reportes
+  Settings,
+  Tags       // 🆕 Icono para configuración
 } from 'lucide-react'
 import { useState } from 'react'
 import { Avatar } from '../ui/Avatar'
@@ -35,12 +42,27 @@ const empresaNavItems = [
   { href: '/dashboardempresa/perfil', icon: User, label: 'Company', active: 'profile' },
 ]
 
+// 🆕 Items de navegación para el dashboard admin
+const adminNavItems = [
+  { href: '/dashboardadmin', icon: LayoutDashboard, label: 'Dashboard', active: 'dashboard' },
+  { href: '/dashboardadmin/candidatos', icon: Users, label: 'Candidatos', active: 'candidatos' },
+  { href: '/dashboardadmin/empresas', icon: Building2, label: 'Empresas', active: 'empresas' },
+  { href: '/dashboardadmin/ofertas', icon: Briefcase, label: 'Ofertas', active: 'ofertas' },
+  { href: '/dashboardadmin/matches', icon: Heart, label: 'Matches', active: 'matches' },
+  { href: '/dashboardadmin/reportes', icon: Flag, label: 'Reportes', active: 'reportes' },
+  { href: '/dashboardadmin/catalogo', icon: Tags, label: 'Catálogo', active: 'catalogo' },
+  { href: '/dashboardadmin/metricas', icon: BarChart3, label: 'Métricas', active: 'metricas' },
+  { href: '/dashboardadmin/usuarios', icon: Shield, label: 'Usuarios', active: 'usuarios' },
+  { href: '/dashboardadmin/config', icon: Settings, label: 'Config', active: 'config' },
+]
+
 export function GlobalNavigation({ activeTab = 'home', notificationCount = 0, type = 'candidato' }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const { logout, usuario } = useAuth()
   
-  const navItems = type === 'empresa' ? empresaNavItems : candidateNavItems
+  // 🆕 Selección de nav items según el tipo de usuario (incluye admin)
+  const navItems = type === 'empresa' ? empresaNavItems : type === 'admin' ? adminNavItems : candidateNavItems
   
   const handleLogout = () => {
     logout()
@@ -52,7 +74,8 @@ export function GlobalNavigation({ activeTab = 'home', notificationCount = 0, ty
       <nav className="fixed top-0 left-0 right-0 z-50 h-14 bg-white border-b border-slate-200">
         <div className="max-w-[1440px] mx-auto px-4 h-full flex items-center justify-between">
           {/* Logo */}
-          <Link href={type === 'empresa' ? '/dashboardempresa' : '/dashboardcandidato'} className="no-underline">
+          {/* 🆕 Logo redirige según tipo (incluye admin) */}
+          <Link href={type === 'empresa' ? '/dashboardempresa' : type === 'admin' ? '/dashboardadmin' : '/dashboardcandidato'} className="no-underline">
             <span className="text-xl font-extrabold text-slate-900 font-sora">
               Link<span className="text-blue-600">Tin</span>
             </span>
