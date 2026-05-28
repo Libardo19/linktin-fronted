@@ -35,11 +35,11 @@ const candidateNavItems = [
 ]
 
 const empresaNavItems = [
-  { href: '/dashboardempresa', icon: Building2, label: 'Dashboard', active: 'home' },
+  { href: '/dashboardempresa', icon: Building2, label: 'Home', active: 'home' },
   { href: '/dashboardempresa/matches', icon: Heart, label: 'Matches', active: 'match' },
-  { href: '/dashboardempresa/ofertas', icon: Briefcase, label: 'Job Posts', active: 'jobs' },
-  { href: '/dashboardempresa/notificaciones', icon: Bell, label: 'Notifications', active: 'notifications' },
-  { href: '/dashboardempresa/perfil', icon: User, label: 'Company', active: 'profile' },
+  { href: '/dashboardempresa/ofertas', icon: Briefcase, label: 'Ofertas', active: 'jobs' },
+  { href: '/dashboardempresa/notificaciones', icon: Bell, label: 'Notificaciones', active: 'notifications' },
+  { href: '/dashboardempresa/perfil', icon: User, label: 'Perfil', active: 'profile' },
 ]
 
 // 🆕 Items de navegación para el dashboard admin
