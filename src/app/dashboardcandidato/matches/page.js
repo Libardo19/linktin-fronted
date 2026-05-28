@@ -9,10 +9,14 @@ import { Badge } from '@/components/ui/Badge'
 import { SlidersHorizontal, Building2, Sparkles, Star } from 'lucide-react'
 import { matchService } from '@/services/match.service'
 import { ofertaService } from '@/services/oferta.service'
+import { recommendationService } from '@/services/recommendation.service'
+import { useAuth } from '@/context/AuthContext'
 
 export default function MatchesPage() {
+  const { usuario } = useAuth()
   const [ofertasDisponibles, setOfertasDisponibles] = useState([])
   const [misMatches, setMisMatches] = useState([])
+  const [scoresMap, setScoresMap] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -21,12 +25,20 @@ export default function MatchesPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [ofertasData, matchesData] = await Promise.all([
+        const [ofertasData, matchesData, postulaciones, recomendaciones] = await Promise.all([
           ofertaService.getAll({ estado: 'activa' }),
           matchService.misMatches(),
+          matchService.feedCandidato(),
+          usuario?.id ? recommendationService.getRecomendaciones(usuario.id) : Promise.resolve([]),
         ])
-        setOfertasDisponibles(ofertasData || [])
+        const likedOfferIds = new Set((postulaciones || []).map(p => p.oferta?.id_ofertas))
+        setOfertasDisponibles((ofertasData || []).filter(o => !likedOfferIds.has(o.id_ofertas)))
         setMisMatches(matchesData || [])
+        const map = {}
+        ;(recomendaciones || []).forEach(r => {
+          map[r.id_oferta] = r.score_match
+        })
+        setScoresMap(map)
       } catch (err) {
         setError('Error al cargar ofertas')
         console.error(err)
@@ -34,8 +46,8 @@ export default function MatchesPage() {
         setLoading(false)
       }
     }
-    fetchData()
-  }, [])
+    if (usuario) fetchData()
+  }, [usuario])
 
   const handlePass = () => {
     setSwipeDirection('left')
@@ -51,7 +63,7 @@ export default function MatchesPage() {
 
     setSwipeDirection('right')
     try {
-      await matchService.darLike(current.id_ofertas)
+      await matchService.darLike(current.id_ofertas, scoresMap[current.id_ofertas])
     } catch (err) {
       console.error('Error al dar like:', err)
     }
@@ -112,7 +124,7 @@ export default function MatchesPage() {
                   location={nextOferta.direccion || 'No especificada'}
                   locationType={nextOferta.modalidad || 'No especificada'}
                   salaryRange={nextOferta.pago ? `$${nextOferta.pago}` : 'A convenir'}
-                  matchPercentage={85}
+                  matchPercentage={scoresMap[nextOferta.id_ofertas] ?? 85}
                   description={nextOferta.descripcion || ''}
                   requiredSkills={nextOferta.habilidades_ofertas?.map(h => h.habilidad?.nombre) || []}
                   matchingSkills={[]}
@@ -131,7 +143,7 @@ export default function MatchesPage() {
                   location={currentOferta.direccion || 'No especificada'}
                   locationType={currentOferta.modalidad || 'No especificada'}
                   salaryRange={currentOferta.pago ? `$${currentOferta.pago}` : 'A convenir'}
-                  matchPercentage={85}
+                  matchPercentage={scoresMap[currentOferta.id_ofertas] ?? 85}
                   description={currentOferta.descripcion || ''}
                   requiredSkills={currentOferta.habilidades_ofertas?.map(h => h.habilidad?.nombre) || []}
                   matchingSkills={[]}

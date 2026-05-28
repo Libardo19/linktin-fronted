@@ -2,8 +2,8 @@ import api from "../lib/axios";
 
 export const matchService = {
     // Para candidato
-    darLike: async (ofertaId) => {
-        const { data } = await api.post(`/api/matches/like/${ofertaId}`);
+    darLike: async (ofertaId, scoreMatch) => {
+        const { data } = await api.post(`/api/matches/like/${ofertaId}`, { score_match: scoreMatch ?? null });
         return data.data;
     },
 
