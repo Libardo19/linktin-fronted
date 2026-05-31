@@ -11,6 +11,7 @@ import { Textarea } from '@/components/ui/Textarea'
 import { Label } from '@/components/ui/Label'
 import { Pencil, Plus, Upload, Building2, GraduationCap, FileText, Users, Briefcase, Save, X } from 'lucide-react'
 import { candidatoService } from '@/services/candidato.service'
+import { storageService } from '@/services/storage.service'
 import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
 
@@ -32,11 +33,18 @@ export default function CandidatoDashboardPage() {
   const [formEdu, setFormEdu] = useState({ institucion: '', titulo: '', anio_inicio: '', anio_fin: '' })
   const [formHab, setFormHab] = useState({ nombre: '', nivel: 'Intermedio' })
   const [guardando, setGuardando] = useState(false)
+  const [cvUrl, setCvUrl] = useState(null)
 
   const fetchPerfil = async () => {
     try {
       const data = await candidatoService.getMiPerfil()
       setPerfil(data)
+      if (data?.hoja_vida && usuario?.id) {
+        try {
+          const url = await storageService.getCvUrl(usuario.id)
+          setCvUrl(url)
+        } catch (_) {}
+      }
     } catch (err) {
       if (err.response?.status === 404) {
         setPerfil(null)
@@ -427,7 +435,13 @@ export default function CandidatoDashboardPage() {
                   <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
                     <FileText className="h-8 w-8 text-blue-600" />
                     <div className="flex-1">
-                      <p className="text-sm font-medium text-slate-900">{perfil.hoja_vida}</p>
+                      {cvUrl ? (
+                        <a href={cvUrl} target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-blue-600 hover:underline">
+                          Ver CV
+                        </a>
+                      ) : (
+                        <p className="text-sm font-medium text-slate-900">CV subido</p>
+                      )}
                       <p className="text-xs text-slate-500">Subido</p>
                     </div>
                   </div>
