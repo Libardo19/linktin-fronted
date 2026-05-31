@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { GlobalNavigation } from '@/components/linktin/Navigation'
 import { MatchCard } from '@/components/linktin/MatchCard'
 import { MatchActions } from '@/components/linktin/MatchActions'
@@ -19,6 +19,8 @@ import { ofertaService } from '@/services/oferta.service'
 import { recommendationService } from '@/services/recommendation.service'
 import { useAuth } from '@/context/AuthContext'
 
+const SWIPE_THRESHOLD = 100
+
 export default function MatchesPage() {
   const { usuario } = useAuth()
   const [ofertasDisponibles, setOfertasDisponibles] = useState([])
@@ -28,6 +30,9 @@ export default function MatchesPage() {
   const [error, setError] = useState(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [swipeDirection, setSwipeDirection] = useState(null)
+  const [dragOffset, setDragOffset] = useState(0)
+  const [dragging, setDragging] = useState(false)
+  const dragStart = useRef(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -56,15 +61,18 @@ export default function MatchesPage() {
     if (usuario) fetchData()
   }, [usuario])
 
-  const handlePass = () => {
-    setSwipeDirection('left')
-    setTimeout(() => {
-      setSwipeDirection(null)
-      setCurrentIndex(prev => prev + 1)
-    }, 300)
-  }
+  const advanceCard = useCallback(() => {
+    setSwipeDirection(null)
+    setDragOffset(0)
+    setCurrentIndex(prev => prev + 1)
+  }, [])
 
-  const handleInterested = async () => {
+  const handlePass = useCallback(() => {
+    setSwipeDirection('left')
+    setTimeout(advanceCard, 300)
+  }, [advanceCard])
+
+  const handleInterested = useCallback(async () => {
     const current = ofertasDisponibles[currentIndex]
     if (!current) return
 
@@ -74,15 +82,59 @@ export default function MatchesPage() {
     } catch (err) {
       console.error('Error al dar like:', err)
     }
-    setTimeout(() => {
+    setTimeout(advanceCard, 300)
+  }, [currentIndex, ofertasDisponibles, scoresMap, advanceCard])
+
+  const handleDragStart = useCallback((clientX) => {
+    if (swipeDirection) return
+    setDragging(true)
+    dragStart.current = clientX
+  }, [swipeDirection])
+
+  const handleDragMove = useCallback((clientX) => {
+    if (!dragging || dragStart.current === null) return
+    const offset = clientX - dragStart.current
+    setDragOffset(offset)
+    if (offset < -SWIPE_THRESHOLD) setSwipeDirection('left')
+    else if (offset > SWIPE_THRESHOLD) setSwipeDirection('right')
+    else setSwipeDirection(null)
+  }, [dragging])
+
+  const handleDragEnd = useCallback(() => {
+    if (!dragging || dragStart.current === null) return
+    setDragging(false)
+    dragStart.current = null
+
+    if (swipeDirection === 'left') {
+      setSwipeDirection('left')
+      setTimeout(advanceCard, 300)
+    } else if (swipeDirection === 'right') {
+      handleInterested()
+    } else {
+      setDragOffset(0)
       setSwipeDirection(null)
-      setCurrentIndex(prev => prev + 1)
-    }, 300)
-  }
+    }
+  }, [dragging, swipeDirection, advanceCard, handleInterested])
+
+  const onMouseDown = (e) => handleDragStart(e.clientX)
+  const onMouseMove = (e) => { if (dragging) handleDragMove(e.clientX) }
+  const onMouseUp = handleDragEnd
+  const onMouseLeave = () => { if (dragging) handleDragEnd() }
+  const onTouchStart = (e) => handleDragStart(e.touches[0].clientX)
+  const onTouchMove = (e) => { if (dragging) handleDragMove(e.touches[0].clientX) }
+  const onTouchEnd = handleDragEnd
 
   const remainingMatches = ofertasDisponibles.length - currentIndex
   const currentOferta = ofertasDisponibles[currentIndex]
   const nextOferta = ofertasDisponibles[currentIndex + 1]
+
+  const cardTransform = dragging
+    ? `translateX(${dragOffset}px) rotate(${dragOffset * 0.05}deg)`
+    : swipeDirection === 'left'
+      ? 'translateX(-150%) rotate(-15deg)'
+      : swipeDirection === 'right'
+        ? 'translateX(150%) rotate(15deg)'
+        : 'translateX(0) rotate(0)'
 
   if (loading) {
     return (
@@ -139,7 +191,7 @@ export default function MatchesPage() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1 flex flex-col items-center">
-            <div className="relative w-full max-w-[400px] h-[560px]">
+            <div className="relative w-full max-w-[400px] h-[560px] select-none">
               {nextOferta && (
                 <div className="absolute inset-x-3 top-3 h-full">
                   <MatchCard
@@ -160,7 +212,20 @@ export default function MatchesPage() {
               )}
 
               {currentOferta ? (
-                <div className="absolute inset-0">
+                <div
+                  className="absolute inset-0 cursor-grab active:cursor-grabbing"
+                  style={{
+                    transform: cardTransform,
+                    transition: dragging ? 'none' : 'transform 0.3s ease-out',
+                  }}
+                  onMouseDown={onMouseDown}
+                  onMouseMove={onMouseMove}
+                  onMouseUp={onMouseUp}
+                  onMouseLeave={onMouseLeave}
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                >
                   <MatchCard
                     id={currentOferta.id_ofertas}
                     companyName={currentOferta.perfil_empresa?.nombre || 'Empresa'}

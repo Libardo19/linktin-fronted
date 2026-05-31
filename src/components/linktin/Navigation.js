@@ -20,7 +20,6 @@ import {
   BarChart3,
   Settings,
   Tags,
-  Sparkles,
 } from 'lucide-react'
 import { useState } from 'react'
 import { Avatar } from '../ui/Avatar'
@@ -30,9 +29,10 @@ import { cn } from '@/lib/utils'
 
 const candidateNavItems = [
   { href: '/dashboardcandidato', icon: Home, label: 'Home', active: 'home' },
-  { href: '/dashboardcandidato/matches', icon: Sparkles, label: 'Descubrir', active: 'match' },
-  { href: '/dashboardcandidato/mensajes', icon: MessageCircle, label: 'Mensajes', active: 'messages' },
-  { href: '/dashboardcandidato/perfil', icon: User, label: 'Perfil', active: 'profile' },
+  { href: '/dashboardcandidato/matches', icon: Heart, label: 'Matches', active: 'match' },
+  { href: '/dashboardcandidato/mensajes', icon: MessageCircle, label: 'Messages', active: 'messages' },
+  { href: '/dashboardcandidato/notificaciones', icon: Bell, label: 'Notifications', active: 'notifications' },
+  { href: '/dashboardcandidato/perfil', icon: User, label: 'Profile', active: 'profile' },
 ]
 
 const empresaNavItems = [
