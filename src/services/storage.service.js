@@ -7,9 +7,7 @@ export const storageService = {
     const formData = new FormData();
     formData.append("archivo", archivo);
 
-    const { data } = await api.post(`/api/storage/${tipo}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const { data } = await api.post(`/api/storage/${tipo}`, formData);
 
     return data.data;
   },
