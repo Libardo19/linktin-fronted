@@ -1,12 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Label } from '@/components/ui/Label'
+import { Camera, Upload } from 'lucide-react'
 import { candidatoService } from '@/services/candidato.service'
+import { storageService } from '@/services/storage.service'
 import { useAuth } from '@/context/AuthContext'
 
 export default function PerfilForm({ perfil, onPerfilCreado, onPerfilActualizado, modo }) {
@@ -22,6 +24,8 @@ export default function PerfilForm({ perfil, onPerfilCreado, onPerfilActualizado
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [success, setSuccess] = useState(null)
+  const [subiendoFoto, setSubiendoFoto] = useState(false)
+  const fotoInputRef = useRef(null)
 
   useEffect(() => {
     if (perfil) {
@@ -39,6 +43,22 @@ export default function PerfilForm({ perfil, onPerfilCreado, onPerfilActualizado
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
+  }
+
+  const handleFotoUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setSubiendoFoto(true)
+    try {
+      const result = await storageService.uploadFile('foto', file)
+      if (onPerfilActualizado) onPerfilActualizado({ ...perfil, foto_url: result.url })
+      setSuccess('Foto de perfil actualizada')
+    } catch (err) {
+      setError(err.response?.data?.message || 'Error al subir la foto')
+    } finally {
+      setSubiendoFoto(false)
+      if (fotoInputRef.current) fotoInputRef.current.value = ''
+    }
   }
 
   const handleSubmit = async (e) => {
@@ -74,6 +94,31 @@ export default function PerfilForm({ perfil, onPerfilCreado, onPerfilActualizado
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex items-center gap-4 mb-4">
+            <div className="relative w-20 h-20 rounded-full bg-slate-100 border-2 border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
+              {perfil?.foto_url ? (
+                <img src={perfil.foto_url} alt="Foto de perfil" className="w-full h-full object-cover" />
+              ) : (
+                <Camera className="h-8 w-8 text-slate-400" />
+              )}
+            </div>
+            <div className="flex-1">
+              <p className="text-sm font-medium text-slate-700">Foto de perfil</p>
+              <p className="text-xs text-slate-400 mb-2">JPG, PNG o WebP. Máximo 2 MB.</p>
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                ref={fotoInputRef}
+                onChange={handleFotoUpload}
+                className="hidden"
+              />
+              <Button type="button" variant="outline" size="sm" onClick={() => fotoInputRef.current?.click()} disabled={subiendoFoto}>
+                <Upload className="h-4 w-4 mr-1" />
+                {subiendoFoto ? 'Subiendo...' : perfil?.foto_url ? 'Cambiar foto' : 'Subir foto'}
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div>
               <Label htmlFor="nombres">Nombres</Label>
