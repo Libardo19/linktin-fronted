@@ -1,51 +1,64 @@
 'use client'
 
-import { Button } from '../ui/Button'
-import { X, Heart, Star } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/Button'
+import { X, Heart, RotateCcw, Star } from 'lucide-react'
 
-export function MatchActions({ 
-  onPass, 
-  onInterested, 
-  onSuperApply,
+export function MatchActions({
+  onPass,
+  onInterested,
+  onUndo,
+  onSuperLike,
   onHoverPass,
-  onHoverInterested
+  onHoverInterested,
+  disabled = false,
 }) {
   return (
-    <div className="flex items-center justify-center gap-6 mt-6">
-      {/* Pass Button */}
+    <div className="flex items-center justify-center gap-3 mt-6">
+      {onUndo && (
+        <button
+          className="w-12 h-12 rounded-full border-2 border-amber-500/30 hover:border-amber-500 hover:bg-amber-500/10 transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={onUndo}
+          disabled={disabled}
+        >
+          <RotateCcw className="h-5 w-5 text-amber-500" />
+        </button>
+      )}
+
       <button
+        className={cn(
+          'w-16 h-16 rounded-full border-2 border-red-500/30 hover:border-red-500 hover:bg-red-500/10 transition-all duration-200 hover:scale-110 flex items-center justify-center',
+          disabled && 'opacity-50 cursor-not-allowed'
+        )}
         onClick={onPass}
         onMouseEnter={() => onHoverPass?.(true)}
         onMouseLeave={() => onHoverPass?.(false)}
-        className="w-16 h-16 rounded-full border-2 border-slate-200 flex items-center justify-center
-          text-slate-400 hover:text-red-500 hover:border-red-400 hover:bg-red-50
-          transition-all duration-200 shadow-sm"
+        disabled={disabled}
       >
-        <X className="h-7 w-7" />
+        <X className="h-7 w-7 text-red-500" />
       </button>
-      
-      {/* Super Apply Button */}
-      {onSuperApply && (
+
+      {onSuperLike && (
         <button
-          onClick={onSuperApply}
-          className="w-14 h-14 rounded-full bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center
-            text-white hover:from-amber-500 hover:to-amber-600
-            transition-all duration-200 shadow-lg shadow-amber-500/30"
+          className="w-12 h-12 rounded-full border-2 border-blue-500/30 hover:border-blue-500 hover:bg-blue-500/10 transition-all duration-200 flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+          onClick={onSuperLike}
+          disabled={disabled}
         >
-          <Star className="h-6 w-6" />
+          <Star className="h-5 w-5 text-blue-500" />
         </button>
       )}
-      
-      {/* Interested Button */}
+
       <button
+        className={cn(
+          'w-16 h-16 rounded-full border-2 border-emerald-500/30 hover:border-emerald-500 hover:bg-emerald-500/10 transition-all duration-200 hover:scale-110 flex items-center justify-center',
+          disabled && 'opacity-50 cursor-not-allowed'
+        )}
         onClick={onInterested}
         onMouseEnter={() => onHoverInterested?.(true)}
         onMouseLeave={() => onHoverInterested?.(false)}
-        className="w-16 h-16 rounded-full border-2 border-slate-200 flex items-center justify-center
-          text-slate-400 hover:text-emerald-500 hover:border-emerald-400 hover:bg-emerald-50
-          transition-all duration-200 shadow-sm"
+        disabled={disabled}
       >
-        <Heart className="h-7 w-7" />
+        <Heart className="h-7 w-7 text-emerald-500" />
       </button>
     </div>
   )
