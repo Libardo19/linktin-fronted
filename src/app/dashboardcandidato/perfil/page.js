@@ -70,6 +70,7 @@ export default function PerfilPage() {
     location: perfil.ubicacion || 'Sin ubicación',
     profileCompletion: perfil.biografia ? 65 : 30,
     isOpenToWork: true,
+    avatar: perfil.foto_url || null,
     about: perfil.biografia || 'Sin descripción',
     skills: perfil.habilidadEmpleados?.map(h => ({
       name: h.habilidad?.nombre || 'Sin nombre',
@@ -130,7 +131,7 @@ export default function PerfilPage() {
         <div className="grid grid-cols-12 gap-6">
           {/* Left Sidebar - Profile Card */}
           <aside className="col-span-3 space-y-4">
-            <ProfileSidebar {...profileData} />
+            <ProfileSidebar {...profileData} avatar={profileData.avatar} />
             
             {/* Quick Stats */}
             <Card>
@@ -182,11 +183,15 @@ export default function PerfilPage() {
                   {/* Avatar */}
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-100 overflow-hidden">
-                      <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                        <span className="text-4xl font-bold text-blue-600">
-                          {(profileData.name || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                        </span>
-                      </div>
+                      {profileData.avatar ? (
+                        <img src={profileData.avatar} alt={profileData.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
+                          <span className="text-4xl font-bold text-blue-600">
+                            {(profileData.name || 'U').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
                     </div>
                     {profileData.isOpenToWork && (
                       <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full whitespace-nowrap">
