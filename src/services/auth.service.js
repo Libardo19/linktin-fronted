@@ -12,11 +12,12 @@
     return data.data; // { token, usuario: { id, email, tipo } }
     };
 
-    export const register = async ({ email, password, tipo }) => {
+    export const register = async ({ email, password, tipo, nombre, apellido }) => {
     const { data } = await api.post("/api/auth/register", {
         email,
         password,
         tipo,
+        profileData: { nombre, apellido },
     });
     return data.data;
     };
