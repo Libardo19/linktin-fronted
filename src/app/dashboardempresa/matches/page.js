@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { Input } from '@/components/ui/Input'
-import { Search, MapPin, GraduationCap, Mail, Eye, CheckCircle, XCircle, Building2, Zap, Briefcase, Star } from 'lucide-react'
+import { Search, MapPin, GraduationCap, Mail, Eye, CheckCircle, XCircle, Building2, Zap, Briefcase, Star, MessageCircle } from 'lucide-react'
 import { matchService } from '@/services/match.service'
 import { empresaService } from '@/services/empresa.service'
 import Link from 'next/link'
@@ -35,16 +35,16 @@ export default function EmpresaMatchesPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [perfilData, matchesData] = await Promise.all([
-          empresaService.getMiPerfil(),
-          matchService.misMatches(),
-        ])
+        const perfilData = await empresaService.getMiPerfil()
         setPerfil(perfilData)
-        setMatches(matchesData || [])
+        setLoading(false)
+
+        matchService.getCandidatosEmpresa()
+          .then(data => setMatches(data || []))
+          .catch(err => console.error('Error al cargar matches:', err))
       } catch (err) {
-        setError('Error al cargar matches')
+        setError('Error al cargar perfil de empresa')
         console.error(err)
-      } finally {
         setLoading(false)
       }
     }
@@ -255,26 +255,39 @@ export default function EmpresaMatchesPage() {
                             <Eye className="h-4 w-4 mr-1" />
                             Profile
                           </Button>
-                          <div className="flex gap-2">
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-emerald-600 hover:text-emerald-700"
-                              onClick={() => handleAccept(match.id_match)}
-                              disabled={match.estadoEmpresa === 'aceptado'}
-                            >
-                              <CheckCircle className="h-4 w-4" />
-                            </Button>
-                            <Button
-                              size="sm"
-                              variant="ghost"
-                              className="text-red-500 hover:text-red-600"
-                              onClick={() => handleReject(match.id_match)}
-                              disabled={match.estadoEmpresa === 'rechazado'}
-                            >
-                              <XCircle className="h-4 w-4" />
-                            </Button>
-                          </div>
+                          {match.estadoEmpresa === 'aceptado' ? (
+                            match.estadoUsuario === 'aceptado' ? (
+                              <Link href={`/dashboardempresa/mensajes?userId=${match.usuario?.id_usuarios}`}>
+                                <Button size="sm" className="w-full gap-1">
+                                  <MessageCircle className="h-4 w-4" />
+                                  Chat
+                                </Button>
+                              </Link>
+                            ) : (
+                              <span className="text-xs text-emerald-600 font-medium">Accepted</span>
+                            )
+                          ) : match.estadoEmpresa === 'rechazado' ? (
+                            <span className="text-xs text-red-500 font-medium">Rejected</span>
+                          ) : (
+                            <div className="flex gap-2">
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-emerald-600 hover:text-emerald-700"
+                                onClick={() => handleAccept(match.id_match)}
+                              >
+                                <CheckCircle className="h-4 w-4" />
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                className="text-red-500 hover:text-red-600"
+                                onClick={() => handleReject(match.id_match)}
+                              >
+                                <XCircle className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </CardContent>

@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { GlobalNavigation } from '@/components/linktin/Navigation'
 import { CompanySidebar } from '@/components/linktin/CompanySidebar'
 import { CandidateCard } from '@/components/linktin/CandidateCard'
@@ -17,6 +18,7 @@ import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
 
 export default function EmpresaDashboardPage() {
+  const router = useRouter()
   const { usuario } = useAuth()
   const [perfil, setPerfil] = useState(null)
   const [ofertas, setOfertas] = useState([])
@@ -27,20 +29,29 @@ export default function EmpresaDashboardPage() {
   const [swipeDirection, setSwipeDirection] = useState(null)
 
   useEffect(() => {
+    if (usuario && usuario.tipo !== 'empresa') {
+      router.replace('/dashboardcandidato')
+      return
+    }
+  }, [usuario, router])
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
-        const [perfilData, ofertasData, matchesData] = await Promise.all([
+        const [perfilData, ofertasData] = await Promise.all([
           empresaService.getMiPerfil(),
           ofertaService.getMisOfertas(),
-          matchService.misMatches(),
         ])
         setPerfil(perfilData)
         setOfertas(ofertasData || [])
-        setMatches(matchesData || [])
+        setLoading(false)
+
+        matchService.getCandidatosEmpresa()
+          .then(data => setMatches(data || []))
+          .catch(err => console.error('Error al cargar candidatos:', err))
       } catch (err) {
         setError('Error al cargar datos de la empresa')
         console.error(err)
-      } finally {
         setLoading(false)
       }
     }
@@ -133,7 +144,7 @@ export default function EmpresaDashboardPage() {
 
   const activeOfertas = ofertas.filter(o => o.estado === 'activa')
   const totalViews = ofertas.reduce((sum, o) => sum + (o.vistas || 0), 0)
-  const totalApplications = ofertas.reduce((sum, o) => sum + (o.postulaciones?.length || 0), 0)
+  const totalApplications = ofertas.reduce((sum, o) => sum + (o._count?.matches || 0), 0)
   const matchRate = matches.length > 0
     ? Math.round((matches.filter(m => m.estadoUsuario === 'aceptado' || m.estadoEmpresa === 'aceptado').length / matches.length) * 100)
     : 0
@@ -406,11 +417,11 @@ export default function EmpresaDashboardPage() {
                       <div>
                         <p className="text-sm font-medium text-slate-900">{oferta.titulo}</p>
                         <p className="text-xs text-slate-500 mt-0.5">
-                          {oferta.modalidad || 'No especificada'} · {oferta.ubicacion || 'Sin ubicación'}
+                          {oferta.modalidad || 'No especificada'} · {oferta.direccion || oferta.perfil_empresa?.ubicacion || 'Sin ubicación'}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="text-xs text-slate-500">{oferta.postulaciones?.length || 0} post.</span>
+                        <span className="text-xs text-slate-500">{oferta._count?.matches || 0} post.</span>
                         <Badge variant={oferta.estado === 'activa' ? 'success' : 'secondary'} className="text-[10px] px-2">
                           {oferta.estado === 'activa' ? 'Activa' : oferta.estado}
                         </Badge>

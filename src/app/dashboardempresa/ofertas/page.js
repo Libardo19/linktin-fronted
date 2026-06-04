@@ -173,10 +173,10 @@ export default function OfertasPage() {
                         </div>
 
                         <div className="flex items-center gap-4 mt-2 text-sm text-slate-500">
-                          {oferta.ubicacion && (
+                          {(oferta.direccion || oferta.perfil_empresa?.ubicacion) && (
                             <span className="flex items-center gap-1">
                               <MapPin className="h-4 w-4" />
-                              {oferta.ubicacion}
+                              {oferta.direccion || oferta.perfil_empresa?.ubicacion}
                             </span>
                           )}
                           {oferta.modalidad && (
@@ -202,7 +202,7 @@ export default function OfertasPage() {
                           <p className="text-xs text-slate-500">Vistas</p>
                         </div>
                         <div className="text-center">
-                          <p className="text-lg font-semibold text-slate-900">{oferta.postulaciones?.length || 0}</p>
+                          <p className="text-lg font-semibold text-slate-900">{oferta._count?.matches || 0}</p>
                           <p className="text-xs text-slate-500">Postulaciones</p>
                         </div>
                         <div className="text-center">

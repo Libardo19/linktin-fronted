@@ -23,6 +23,11 @@ export const matchService = {
     },
 
     // Para empresa
+    getCandidatosEmpresa: async () => {
+        const { data } = await api.get("/api/matches/empresa/candidatos");
+        return data.data;
+    },
+
     feedEmpresa: async (ofertaId) => {
         const { data } = await api.get(`/api/matches/oferta/${ofertaId}/candidatos`);
         return data.data;

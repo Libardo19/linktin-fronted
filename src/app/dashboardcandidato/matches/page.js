@@ -18,6 +18,7 @@ import { matchService } from '@/services/match.service'
 import { ofertaService } from '@/services/oferta.service'
 import { recommendationService } from '@/services/recommendation.service'
 import { useAuth } from '@/context/AuthContext'
+import Link from 'next/link'
 
 const SWIPE_THRESHOLD = 100
 
@@ -28,6 +29,7 @@ export default function MatchesPage() {
   const [scoresMap, setScoresMap] = useState({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [likeError, setLikeError] = useState(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [swipeDirection, setSwipeDirection] = useState(null)
   const [dragOffset, setDragOffset] = useState(0)
@@ -37,20 +39,26 @@ export default function MatchesPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [ofertasData, matchesData, postulaciones, recomendaciones] = await Promise.all([
+        const [ofertasData, matchesData, postulaciones] = await Promise.all([
           ofertaService.getAll({ estado: 'activa' }),
           matchService.misMatches(),
           matchService.feedCandidato(),
-          usuario?.id ? recommendationService.getRecomendaciones(usuario.id) : Promise.resolve([]),
         ])
         const likedOfferIds = new Set((postulaciones || []).map(p => p.oferta?.id_ofertas))
         setOfertasDisponibles((ofertasData || []).filter(o => !likedOfferIds.has(o.id_ofertas)))
         setMisMatches(matchesData || [])
-        const map = {}
-        ;(recomendaciones || []).forEach(r => {
-          map[r.id_oferta] = r.score_match
-        })
-        setScoresMap(map)
+
+        if (usuario?.id) {
+          recommendationService.getRecomendaciones(usuario.id)
+            .then(recomendaciones => {
+              const map = {}
+              ;(recomendaciones || []).forEach(r => {
+                map[r.id_oferta] = r.score_match
+              })
+              setScoresMap(map)
+            })
+            .catch(err => console.error('Error al cargar recomendaciones:', err))
+        }
       } catch (err) {
         setError('Error al cargar ofertas')
         console.error(err)
@@ -80,8 +88,12 @@ export default function MatchesPage() {
     try {
       await matchService.darLike(current.id_ofertas, scoresMap[current.id_ofertas])
     } catch (err) {
-      console.error('Error al dar like:', err)
+      const message = err.response?.data?.message || 'Error al aplicar a la oferta'
+      setLikeError(message)
+      setSwipeDirection(null)
+      return
     }
+    setLikeError(null)
     setTimeout(advanceCard, 300)
   }, [currentIndex, ofertasDisponibles, scoresMap, advanceCard])
 
@@ -191,6 +203,11 @@ export default function MatchesPage() {
 
         <div className="flex flex-col lg:flex-row gap-8">
           <div className="flex-1 flex flex-col items-center">
+            {likeError && (
+              <div className="w-full max-w-[400px] mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm text-center">
+                {likeError}
+              </div>
+            )}
             <div className="relative w-full max-w-[400px] h-[560px] select-none">
               {nextOferta && (
                 <div className="absolute inset-x-3 top-3 h-full">
@@ -295,9 +312,10 @@ export default function MatchesPage() {
 
                   <div className="space-y-3">
                     {misMatches.map((match) => (
-                      <button
+                      <Link
                         key={match.id_match}
-                        className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-slate-50 transition-colors group"
+                        href="/dashboardcandidato/mensajes"
+                        className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-slate-50 transition-colors group no-underline"
                       >
                         <div className="relative">
                           <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center ring-2 ring-emerald-500 ring-offset-2 ring-offset-white transition-all group-hover:ring-offset-slate-50">
@@ -310,11 +328,11 @@ export default function MatchesPage() {
                             {match.oferta?.perfil_empresa?.nombre || 'Empresa'}
                           </p>
                           <p className="text-xs text-slate-500">
-                            Nuevo match · Enviar mensaje
+                            Match · Ir al chat
                           </p>
                         </div>
                         <ChevronRight className="h-4 w-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </button>
+                      </Link>
                     ))}
                   </div>
                 </div>
