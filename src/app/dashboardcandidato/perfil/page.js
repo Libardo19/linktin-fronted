@@ -6,8 +6,11 @@ import { ProfileSidebar } from '@/components/linktin/ProfileSidebar'
 import { SkillTag } from '@/components/linktin/SkillTag'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Input } from '@/components/ui/Input'
+import { Label } from '@/components/ui/Label'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/Tabs'
-import { Pencil, Settings, Share2, Building2, GraduationCap, Award, ExternalLink } from 'lucide-react'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/Dialog'
+import { Pencil, Settings, Share2, Building2, GraduationCap, Award, ExternalLink, Plus, Trash2 } from 'lucide-react'
 import { candidatoService } from '@/services/candidato.service'
 import { useAuth } from '@/context/AuthContext'
 import PerfilForm from '@/components/candidato/PerfilForm'
@@ -18,6 +21,12 @@ export default function PerfilPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [editando, setEditando] = useState(false)
+  const [showExpModal, setShowExpModal] = useState(false)
+  const [showEduModal, setShowEduModal] = useState(false)
+  const [showSkillModal, setShowSkillModal] = useState(false)
+  const [expForm, setExpForm] = useState({ empresa: '', cargo: '', anio_inicio: '', anio_fin: '' })
+  const [eduForm, setEduForm] = useState({ institucion: '', titulo: '', anio_inicio: '', anio_fin: '' })
+  const [skillForm, setSkillForm] = useState({ nombre: '', categoria: '', nivel: 'intermedio' })
 
   const fetchPerfil = async () => {
     try {
@@ -41,6 +50,81 @@ export default function PerfilPage() {
   const handlePerfilActualizado = (perfilActualizado) => {
     setPerfil(perfilActualizado)
     setEditando(false)
+  }
+
+  const handleAddExperiencia = async (e) => {
+    e.preventDefault()
+    try {
+      const payload = {
+        empresa: expForm.empresa,
+        cargo: expForm.cargo,
+        anio_inicio: parseInt(expForm.anio_inicio),
+        anio_fin: expForm.anio_fin ? parseInt(expForm.anio_fin) : null,
+      }
+      await candidatoService.addExperiencia(perfil.id_candidato, payload)
+      setShowExpModal(false)
+      setExpForm({ empresa: '', cargo: '', anio_inicio: '', anio_fin: '' })
+      fetchPerfil()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al agregar experiencia')
+    }
+  }
+
+  const handleDeleteExperiencia = async (expId) => {
+    try {
+      await candidatoService.deleteExperiencia(perfil.id_candidato, expId)
+      fetchPerfil()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al eliminar experiencia')
+    }
+  }
+
+  const handleAddEducacion = async (e) => {
+    e.preventDefault()
+    try {
+      const payload = {
+        institucion: eduForm.institucion,
+        titulo: eduForm.titulo,
+        anio_inicio: parseInt(eduForm.anio_inicio),
+        anio_fin: eduForm.anio_fin ? parseInt(eduForm.anio_fin) : null,
+      }
+      await candidatoService.addEducacion(perfil.id_candidato, payload)
+      setShowEduModal(false)
+      setEduForm({ institucion: '', titulo: '', anio_inicio: '', anio_fin: '' })
+      fetchPerfil()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al agregar educación')
+    }
+  }
+
+  const handleDeleteEducacion = async (eduId) => {
+    try {
+      await candidatoService.deleteEducacion(perfil.id_candidato, eduId)
+      fetchPerfil()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al eliminar educación')
+    }
+  }
+
+  const handleAddHabilidad = async (e) => {
+    e.preventDefault()
+    try {
+      await candidatoService.addHabilidad(perfil.id_candidato, skillForm)
+      setShowSkillModal(false)
+      setSkillForm({ nombre: '', categoria: '', nivel: 3 })
+      fetchPerfil()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al agregar habilidad')
+    }
+  }
+
+  const handleDeleteHabilidad = async (habId) => {
+    try {
+      await candidatoService.deleteHabilidad(perfil.id_candidato, habId)
+      fetchPerfil()
+    } catch (err) {
+      alert(err.response?.data?.message || 'Error al eliminar habilidad')
+    }
   }
 
   if (loading) {
@@ -282,22 +366,24 @@ export default function PerfilPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-lg font-semibold">Experience</CardTitle>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" onClick={() => setShowExpModal(true)}>
+                      <Plus className="h-4 w-4 mr-1" /> Add
                     </Button>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     {profileData.experience && profileData.experience.length > 0 ? profileData.experience.map((exp) => (
-                      <div key={exp.id} className="flex gap-4">
+                      <div key={exp.id} className="flex gap-4 group">
                         <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
                           <Building2 className="h-6 w-6 text-slate-500" />
                         </div>
                         <div className="flex-1">
                           <h4 className="font-medium text-slate-900">{exp.title}</h4>
-                          <p className="text-sm text-slate-600">{exp.company} · {exp.location}</p>
+                          <p className="text-sm text-slate-600">{exp.company}</p>
                           <p className="text-xs text-slate-400">{exp.dateRange}</p>
-                          <p className="text-sm text-slate-600 mt-2">{exp.description}</p>
                         </div>
+                        <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100" onClick={() => handleDeleteExperiencia(exp.id)}>
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
                       </div>
                     )) : (
                       <p className="text-sm text-slate-400 italic">No hay experiencia laboral</p>
@@ -310,19 +396,20 @@ export default function PerfilPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-lg font-semibold">Skills</CardTitle>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" onClick={() => setShowSkillModal(true)}>
+                      <Plus className="h-4 w-4 mr-1" /> Add
                     </Button>
                   </CardHeader>
                   <CardContent>
                     <div className="flex flex-wrap gap-2">
                       {profileData.skills && profileData.skills.length > 0 ? (
                         profileData.skills.map((skill) => (
-                          <SkillTag 
-                            key={skill.name} 
-                            skill={skill.name} 
-                            endorsements={skill.endorsements}
-                          />
+                          <div key={skill.name} className="relative group">
+                            <SkillTag 
+                              skill={skill.name} 
+                              endorsements={skill.endorsements}
+                            />
+                          </div>
                         ))
                       ) : (
                         <p className="text-sm text-slate-400 italic">No hay habilidades</p>
@@ -336,14 +423,14 @@ export default function PerfilPage() {
                 <Card>
                   <CardHeader className="flex flex-row items-center justify-between pb-2">
                     <CardTitle className="text-lg font-semibold">Education</CardTitle>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="h-4 w-4" />
+                    <Button variant="ghost" size="sm" onClick={() => setShowEduModal(true)}>
+                      <Plus className="h-4 w-4 mr-1" /> Add
                     </Button>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {profileData.education && profileData.education.length > 0 ? (
                       profileData.education.map((edu) => (
-                        <div key={edu.id} className="flex gap-4">
+                        <div key={edu.id} className="flex gap-4 group">
                         <div className="w-12 h-12 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center flex-shrink-0">
                           <GraduationCap className="h-6 w-6 text-slate-500" />
                         </div>
@@ -351,8 +438,10 @@ export default function PerfilPage() {
                           <h4 className="font-medium text-slate-900">{edu.degree}</h4>
                           <p className="text-sm text-slate-600">{edu.institution}</p>
                           <p className="text-xs text-slate-400">{edu.years}</p>
-                          <p className="text-sm text-slate-600 mt-1">{edu.description}</p>
                         </div>
+                        <Button variant="ghost" size="icon" className="opacity-0 group-hover:opacity-100" onClick={() => handleDeleteEducacion(edu.id)}>
+                          <Trash2 className="h-4 w-4 text-red-500" />
+                        </Button>
                       </div>
                       ))
                     ) : (
@@ -364,6 +453,108 @@ export default function PerfilPage() {
             </Tabs>
           </div>
         </div>
+
+        {/* Experience Modal */}
+        <Dialog open={showExpModal} onClose={() => setShowExpModal(false)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Agregar experiencia</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddExperiencia} className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="exp-empresa">Empresa</Label>
+                <Input id="exp-empresa" value={expForm.empresa} onChange={(e) => setExpForm({ ...expForm, empresa: e.target.value })} required />
+              </div>
+              <div>
+                <Label htmlFor="exp-cargo">Cargo</Label>
+                <Input id="exp-cargo" value={expForm.cargo} onChange={(e) => setExpForm({ ...expForm, cargo: e.target.value })} required />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="exp-inicio">Año inicio</Label>
+                  <Input id="exp-inicio" type="number" value={expForm.anio_inicio} onChange={(e) => setExpForm({ ...expForm, anio_inicio: e.target.value })} required />
+                </div>
+                <div>
+                  <Label htmlFor="exp-fin">Año fin</Label>
+                  <Input id="exp-fin" type="number" value={expForm.anio_fin} onChange={(e) => setExpForm({ ...expForm, anio_fin: e.target.value })} placeholder="Dejar vacío si es actual" />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowExpModal(false)}>Cancelar</Button>
+                <Button type="submit">Guardar</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Education Modal */}
+        <Dialog open={showEduModal} onClose={() => setShowEduModal(false)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Agregar educación</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddEducacion} className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="edu-institucion">Institución</Label>
+                <Input id="edu-institucion" value={eduForm.institucion} onChange={(e) => setEduForm({ ...eduForm, institucion: e.target.value })} required />
+              </div>
+              <div>
+                <Label htmlFor="edu-titulo">Título</Label>
+                <Input id="edu-titulo" value={eduForm.titulo} onChange={(e) => setEduForm({ ...eduForm, titulo: e.target.value })} required />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="edu-inicio">Año inicio</Label>
+                  <Input id="edu-inicio" type="number" value={eduForm.anio_inicio} onChange={(e) => setEduForm({ ...eduForm, anio_inicio: e.target.value })} required />
+                </div>
+                <div>
+                  <Label htmlFor="edu-fin">Año fin</Label>
+                  <Input id="edu-fin" type="number" value={eduForm.anio_fin} onChange={(e) => setEduForm({ ...eduForm, anio_fin: e.target.value })} placeholder="Dejar vacío si es actual" />
+                </div>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowEduModal(false)}>Cancelar</Button>
+                <Button type="submit">Guardar</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
+
+        {/* Skill Modal */}
+        <Dialog open={showSkillModal} onClose={() => setShowSkillModal(false)}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Agregar habilidad</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleAddHabilidad} className="space-y-4 mt-4">
+              <div>
+                <Label htmlFor="skill-nombre">Nombre</Label>
+                <Input id="skill-nombre" value={skillForm.nombre} onChange={(e) => setSkillForm({ ...skillForm, nombre: e.target.value })} required />
+              </div>
+              <div>
+                <Label htmlFor="skill-categoria">Categoría</Label>
+                <Input id="skill-categoria" value={skillForm.categoria} onChange={(e) => setSkillForm({ ...skillForm, categoria: e.target.value })} placeholder="Ej: Frontend, Backend, Diseño" />
+              </div>
+              <div>
+                <Label htmlFor="skill-nivel">Nivel</Label>
+                <select
+                  id="skill-nivel"
+                  value={skillForm.nivel}
+                  onChange={(e) => setSkillForm({ ...skillForm, nivel: e.target.value })}
+                  className="flex h-10 w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                >
+                  <option value="basico">Básico</option>
+                  <option value="intermedio">Intermedio</option>
+                  <option value="avanzado">Avanzado</option>
+                </select>
+              </div>
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => setShowSkillModal(false)}>Cancelar</Button>
+                <Button type="submit">Guardar</Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   )
