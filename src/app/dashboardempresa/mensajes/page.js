@@ -56,7 +56,7 @@ function formatMsgTime(dateStr) {
   return `${d.toLocaleDateString()}, ${time}`
 }
 
-export default function MensajesPage() {
+export default function EmpresaMensajesPage() {
   const { usuario } = useAuth()
   const searchParams = useSearchParams()
   const [conversaciones, setConversaciones] = useState([])
@@ -184,11 +184,11 @@ export default function MensajesPage() {
   })
 
   const otherName = activeConv ? getOtherName(activeConv, usuario?.id) : ''
-  const OtherIcon = activeConv ? getOtherIcon(activeConv, usuario?.id) : Building2
+  const OtherIcon = activeConv ? getOtherIcon(activeConv, usuario?.id) : User
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <GlobalNavigation activeTab="messages" notificationCount={0} type="candidato" />
+      <GlobalNavigation activeTab="messages" notificationCount={0} type="empresa" />
 
       <main className="max-w-[1440px] mx-auto h-[calc(100vh-56px)] pt-14">
         <div className="flex h-full border-x border-slate-200 bg-white">
