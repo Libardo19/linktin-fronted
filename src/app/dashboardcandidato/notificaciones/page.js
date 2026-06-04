@@ -1,41 +1,58 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { GlobalNavigation } from '@/components/linktin/Navigation'
 import { NotificationItem } from '@/components/linktin/NotificationItem'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { notificacionesService } from '@/services/notificaciones.service'
+import { connectSocket } from '@/services/socket.service'
+import { useNotifications } from '@/context/NotificationContext'
+import { formatearNotificacion } from '@/utils/notificaciones.helper'
 
 export default function NotificacionesPage() {
   const [notificaciones, setNotificaciones] = useState([])
   const [loading, setLoading] = useState(true)
   const [activeFilter, setActiveFilter] = useState('all')
-  const [unreadCount, setUnreadCount] = useState(0)
+  const { unreadCount, setUnreadCount, fetchUnreadCount } = useNotifications()
 
-  const fetchNotificaciones = async () => {
+  const fetchNotificaciones = useCallback(async () => {
     try {
       const data = await notificacionesService.getMisNotificaciones()
-      const list = data || []
+      const list = data?.data || data || []
       setNotificaciones(list)
-      setUnreadCount(list.filter((n) => !n.leida).length)
+      setUnreadCount(list.filter((n) => !n.leido).length)
     } catch (err) {
       console.error('Error al cargar notificaciones:', err)
       setNotificaciones([])
     } finally {
       setLoading(false)
     }
-  }
+  }, [setUnreadCount])
 
   useEffect(() => {
     fetchNotificaciones()
-  }, [])
+  }, [fetchNotificaciones])
+
+  useEffect(() => {
+    const socket = connectSocket()
+    if (!socket) return
+
+    const handleNuevaNotificacion = () => {
+      fetchNotificaciones()
+    }
+
+    socket.on('nueva_notificacion', handleNuevaNotificacion)
+    return () => {
+      socket.off('nueva_notificacion', handleNuevaNotificacion)
+    }
+  }, [fetchNotificaciones])
 
   const handleMarcarLeida = async (id) => {
     try {
       await notificacionesService.marcarLeida(id)
       setNotificaciones((prev) =>
-        prev.map((n) => (n.id_notificacion === id ? { ...n, leida: true } : n))
+        prev.map((n) => (n.id_notificaciones === id ? { ...n, leido: true } : n))
       )
       setUnreadCount((prev) => Math.max(0, prev - 1))
     } catch (err) {
@@ -46,7 +63,7 @@ export default function NotificacionesPage() {
   const handleMarcarTodasLeidas = async () => {
     try {
       await notificacionesService.marcarTodasLeidas()
-      setNotificaciones((prev) => prev.map((n) => ({ ...n, leida: true })))
+      setNotificaciones((prev) => prev.map((n) => ({ ...n, leido: true })))
       setUnreadCount(0)
     } catch (err) {
       console.error('Error al marcar todas como leídas:', err)
@@ -61,6 +78,7 @@ export default function NotificacionesPage() {
       nueva_oferta: 'job',
       oferta_cerrada: 'job',
       postulacion_nueva: 'view',
+      mensaje_recibido: 'message',
     }
     return typeMap[tipo] || 'match'
   }
@@ -119,18 +137,26 @@ export default function NotificacionesPage() {
 
         <Card className="overflow-hidden">
           {filteredNotificaciones.length > 0 ? (
-            filteredNotificaciones.map((notif) => (
-              <NotificationItem
-                key={notif.id_notificacion}
-                type={getNotificationType(notif.tipo)}
-                title={notif.mensaje || 'Notificación'}
-                description={notif.descripcion || ''}
-                timestamp={formatTimestamp(notif.fecha_creacion || notif.createdAt)}
-                isUnread={!notif.leida}
-                onAction={() => handleMarcarLeida(notif.id_notificacion)}
-                actionLabel="Marcar leída"
-              />
-            ))
+            filteredNotificaciones.map((notif) => {
+              const { title, description } = formatearNotificacion(notif)
+              const accionHref =
+                notif.tipo === 'mensaje_recibido' || notif.tipo === 'match_aceptado'
+                  ? '/dashboardcandidato/mensajes'
+                  : null
+              return (
+                <NotificationItem
+                  key={notif.id_notificaciones}
+                  type={getNotificationType(notif.tipo)}
+                  title={title}
+                  description={description}
+                  timestamp={formatTimestamp(notif.fecha_creacion || notif.createdAt)}
+                  isUnread={!notif.leido}
+                  onAction={() => handleMarcarLeida(notif.id_notificaciones)}
+                  actionLabel="Marcar leída"
+                  href={accionHref}
+                />
+              )
+            })
           ) : (
             <div className="p-8 text-center">
               <p className="text-slate-500">No hay notificaciones en esta categoría</p>
