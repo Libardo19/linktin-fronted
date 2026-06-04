@@ -25,6 +25,7 @@ import { useState } from 'react'
 import { Avatar } from '../ui/Avatar'
 import { Badge } from '../ui/Badge'
 import { useAuth } from '../../context/AuthContext'
+import { useNotifications } from '../../context/NotificationContext'
 import { cn } from '@/lib/utils'
 
 const candidateNavItems = [
@@ -38,6 +39,7 @@ const candidateNavItems = [
 const empresaNavItems = [
   { href: '/dashboardempresa', icon: Building2, label: 'Home', active: 'home' },
   { href: '/dashboardempresa/matches', icon: Heart, label: 'Matches', active: 'match' },
+  { href: '/dashboardempresa/mensajes', icon: MessageCircle, label: 'Messages', active: 'messages' },
   { href: '/dashboardempresa/ofertas', icon: Briefcase, label: 'Ofertas', active: 'jobs' },
   { href: '/dashboardempresa/notificaciones', icon: Bell, label: 'Notificaciones', active: 'notifications' },
   { href: '/dashboardempresa/perfil', icon: User, label: 'Perfil', active: 'profile' },
@@ -56,10 +58,12 @@ const adminNavItems = [
   { href: '/dashboardadmin/config', icon: Settings, label: 'Config', active: 'config' },
 ]
 
-export function GlobalNavigation({ activeTab = 'home', notificationCount = 0, type = 'candidato' }) {
+export function GlobalNavigation({ activeTab = 'home', notificationCount: _notificationCount, type = 'candidato' }) {
   const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
   const { logout, usuario } = useAuth()
+  const { unreadCount } = useNotifications()
+  const notificationCount = _notificationCount ?? unreadCount
 
   const navItems = type === 'empresa' ? empresaNavItems : type === 'admin' ? adminNavItems : candidateNavItems
 

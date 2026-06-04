@@ -1,4 +1,5 @@
 import { AuthProvider } from '../context/AuthContext'
+import { NotificationProvider } from '../context/NotificationContext'
 import './globals.css'
 
 export const metadata = {
@@ -11,7 +12,9 @@ export default function RootLayout({ children }) {
     <html lang="es">
       <body>
         <AuthProvider>
-          {children}
+          <NotificationProvider>
+            {children}
+          </NotificationProvider>
         </AuthProvider>
       </body>
     </html>

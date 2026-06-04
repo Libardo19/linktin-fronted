@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { Heart, Briefcase, Eye, Award, Bell, MessageCircle } from 'lucide-react'
 import { Button } from '../ui/Button'
 
@@ -12,34 +13,32 @@ const icons = {
   message: MessageCircle,
 }
 
-export function NotificationItem({ 
+export function NotificationItem({
   type = 'match',
   title = '',
   description = '',
   timestamp = '',
   isUnread = false,
   actionLabel,
-  onAction
+  onAction,
+  href,
 }) {
   const Icon = icons[type] || Bell
-  
-  return (
+  const content = (
     <div className={`
       flex items-start gap-3 p-4 hover:bg-slate-50 transition-colors
       ${isUnread ? 'bg-blue-50/50' : ''}
     `}>
-      {/* Icon */}
       <div className={`
         w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0
-        ${type === 'match' ? 'bg-emerald-100 text-emerald-600' : 
+        ${type === 'match' ? 'bg-emerald-100 text-emerald-600' :
           type === 'job' ? 'bg-blue-100 text-blue-600' :
           type === 'view' ? 'bg-purple-100 text-purple-600' :
           'bg-slate-100 text-slate-600'}
       `}>
         <Icon className="h-5 w-5" />
       </div>
-      
-      {/* Content */}
+
       <div className="flex-1 min-w-0">
         <p className={`text-sm ${isUnread ? 'font-semibold text-slate-900' : 'text-slate-700'}`}>
           {title}
@@ -49,26 +48,34 @@ export function NotificationItem({
         )}
         <p className="text-xs text-slate-400 mt-1">{timestamp}</p>
       </div>
-      
-      {/* Action Button */}
+
       {actionLabel && onAction && (
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={(e) => {
             e.stopPropagation()
             onAction()
           }}
-          className="text-blue-600 hover:text-blue-700"
+          className="text-blue-600 hover:text-blue-700 z-10"
         >
           {actionLabel}
         </Button>
       )}
-      
-      {/* Unread indicator */}
+
       {isUnread && (
         <div className="w-2 h-2 rounded-full bg-blue-600 flex-shrink-0 mt-2" />
       )}
     </div>
   )
+
+  if (href) {
+    return (
+      <Link href={href} className="block no-underline">
+        {content}
+      </Link>
+    )
+  }
+
+  return content
 }
