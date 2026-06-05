@@ -14,6 +14,7 @@ import { Pencil, Settings, Share2, Building2, GraduationCap, Award, ExternalLink
 import { candidatoService } from '@/services/candidato.service'
 import { useAuth } from '@/context/AuthContext'
 import PerfilForm from '@/components/candidato/PerfilForm'
+import ResenasPerfil from '@/components/resenas/ResenasPerfil'
 
 export default function PerfilPage() {
   const { usuario } = useAuth()
@@ -235,6 +236,9 @@ export default function PerfilPage() {
               </CardContent>
             </Card>
 
+            {/* Reseñas recibidas - vista compacta */}
+            <ResenasPerfil idUsuario={usuario?.id} compact={true} />
+
             {/* Languages */}
             <Card>
               <CardHeader className="pb-2">
@@ -319,6 +323,7 @@ export default function PerfilPage() {
                 <TabsTrigger value="experience">Experience</TabsTrigger>
                 <TabsTrigger value="skills">Skills</TabsTrigger>
                 <TabsTrigger value="education">Education</TabsTrigger>
+                <TabsTrigger value="reviews">Reviews</TabsTrigger>
               </TabsList>
 
               <TabsContent value="about" className="space-y-4">
@@ -422,6 +427,10 @@ export default function PerfilPage() {
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="reviews" className="space-y-4">
+                <ResenasPerfil idUsuario={usuario?.id} />
               </TabsContent>
 
               <TabsContent value="education" className="space-y-4">

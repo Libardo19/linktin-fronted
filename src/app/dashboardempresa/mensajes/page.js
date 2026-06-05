@@ -12,7 +12,10 @@ import { GlobalNavigation } from '@/components/linktin/Navigation'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
-import { Search, Send, Building2, User, MessageCircle } from 'lucide-react'
+import { Search, Send, Building2, User, MessageCircle, Star } from 'lucide-react'
+import { matchService } from '@/services/match.service'
+import { resenaService } from '@/services/resena.service'
+import ResenaModal from '@/components/resenas/ResenaModal'
 
 function getOtherUser(conv, userId) {
   return conv.participantes?.find(p => p.id_usuarios !== userId)
@@ -66,6 +69,12 @@ export default function EmpresaMensajesPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [loading, setLoading] = useState(true)
   const [otherUserTyping, setOtherUserTyping] = useState(false)
+  const [matchesCandidatos, setMatchesCandidatos] = useState([])
+  const [misResenas, setMisResenas] = useState([])
+  const [showResenaModal, setShowResenaModal] = useState(false)
+  const [matchParaResena, setMatchParaResena] = useState(null)
+  const [yaResenado, setYaResenado] = useState(null)
+  const [enviandoResena, setEnviandoResena] = useState(false)
   const messagesEndRef = useRef(null)
   const typingTimeoutRef = useRef(null)
   const otherTypingTimeoutRef = useRef(null)
@@ -153,6 +162,70 @@ export default function EmpresaMensajesPage() {
       socket.off('usuario_dejo_escribir', onStopTyping)
     }
   }, [activeConv?.id, usuario?.id, scrollToBottom])
+
+  /*
+    Cuando cambia la conversación activa, busca si hay un match efectivo
+    con el otro participante y si ya se dejó reseña en ese match.
+    Para la empresa: el otro usuario es un candidato, lo buscamos en matchesCandidatos.
+  */
+  useEffect(() => {
+    if (!activeConv || !usuario) {
+      setMatchParaResena(null)
+      setYaResenado(null)
+      return
+    }
+
+    const otro = activeConv.participantes?.find(p => p.id_usuarios !== usuario.id)
+    if (!otro) return
+
+    const cargarDatos = async () => {
+      try {
+        const [matches, resenas] = await Promise.all([
+          matchService.getCandidatosEmpresa(),
+          resenaService.getMisResenas(),
+        ])
+        setMatchesCandidatos(matches || [])
+        setMisResenas(resenas || [])
+
+        // Buscar match donde el candidato (usuario.id_usuarios) sea el otro usuario
+        const match = (matches || []).find(
+          m => m.usuario?.id_usuarios === otro.id_usuarios
+            && m.estadoUsuario === 'aceptado'
+            && m.estadoEmpresa === 'aceptado'
+        )
+        if (match) {
+          setMatchParaResena(match)
+          const ya = (resenas || []).find(r => r.id_match === match.id_match)
+          setYaResenado(ya || null)
+        } else {
+          setMatchParaResena(null)
+          setYaResenado(null)
+        }
+      } catch {
+        setMatchParaResena(null)
+        setYaResenado(null)
+      }
+    }
+    cargarDatos()
+  }, [activeConv, usuario])
+
+  /*
+    Envía la reseña al backend y actualiza el estado local.
+  */
+  const handleEnviarResena = async ({ raiting, comentario }) => {
+    if (!matchParaResena) return
+    setEnviandoResena(true)
+    try {
+      const resena = await resenaService.create(matchParaResena.id_match, raiting, comentario)
+      setYaResenado(resena)
+      setShowResenaModal(false)
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Error al enviar la reseña'
+      alert(msg)
+    } finally {
+      setEnviandoResena(false)
+    }
+  }
 
   const handleSend = () => {
     if (!newMessage.trim() || !activeConv?.id) return
@@ -277,6 +350,39 @@ export default function EmpresaMensajesPage() {
                   </div>
                 </div>
 
+                {/* Banner de reseña: aparece solo si hay match efectivo con el otro usuario */}
+                {matchParaResena && (
+                  <div className="px-4 pt-3 pb-1">
+                    <div className={`rounded-lg border p-3 flex items-center justify-between ${
+                      yaResenado
+                        ? 'bg-emerald-50 border-emerald-200'
+                        : 'bg-amber-50 border-amber-200'
+                    }`}>
+                      <div className="flex items-center gap-2">
+                        <Star className={`h-4 w-4 ${
+                          yaResenado ? 'text-emerald-500' : 'text-amber-500'
+                        }`} />
+                        <p className={`text-sm font-medium ${
+                          yaResenado ? 'text-emerald-700' : 'text-amber-700'
+                        }`}>
+                          {yaResenado
+                            ? `Reseñaste a ${otherName} con ${yaResenado.raiting} estrellas`
+                            : `Deja una reseña para ${otherName}`
+                          }
+                        </p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant={yaResenado ? 'ghost' : 'default'}
+                        className={yaResenado ? 'text-emerald-600' : ''}
+                        onClick={() => yaResenado ? null : setShowResenaModal(true)}
+                      >
+                        {yaResenado ? 'Ver reseña' : 'Reseñar'}
+                      </Button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex-1 overflow-y-auto p-4 space-y-3">
                   {mensajes.length === 0 && !otherUserTyping && (
                     <div className="flex flex-col items-center justify-center h-full text-center">
@@ -353,6 +459,15 @@ export default function EmpresaMensajesPage() {
           </div>
         </div>
       </main>
+
+      {/* Modal de reseña */}
+      <ResenaModal
+        isOpen={showResenaModal}
+        onClose={() => setShowResenaModal(false)}
+        onSubmit={handleEnviarResena}
+        targetName={otherName}
+        loading={enviandoResena}
+      />
     </div>
   )
 }

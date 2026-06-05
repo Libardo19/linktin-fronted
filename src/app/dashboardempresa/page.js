@@ -185,6 +185,7 @@ export default function EmpresaDashboardPage() {
               newMatches={candidatos.length}
               profileCompletion={perfil?.biografia ? 85 : 45}
               rating={4.5}
+              logo={perfil?.logo_url || null}
             />
           </aside>
 

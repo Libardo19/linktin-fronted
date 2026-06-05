@@ -19,8 +19,11 @@
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
+        const hadToken = !!Cookies.get("linktin_token");
         Cookies.remove("linktin_token");
-        window.location.href = "/auth/login"; // ← corregido
+        if (hadToken) {
+            window.location.href = "/auth/login";
+        }
         }
         return Promise.reject(error);
     }
