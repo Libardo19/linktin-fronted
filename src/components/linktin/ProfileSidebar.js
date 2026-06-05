@@ -15,7 +15,8 @@ export function ProfileSidebar({
   isOpenToWork = false,
   connections = 0,
   profileViews = 0,
-  searchAppearances = 0
+  searchAppearances = 0,
+  avatar = null
 }) {
   const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()
   
@@ -29,8 +30,12 @@ export function ProfileSidebar({
           
           {/* Avatar */}
           <div className="relative -mt-8 mb-3">
-            <div className="w-20 h-20 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center mx-auto">
-              <span className="text-2xl font-bold text-blue-600">{initials}</span>
+            <div className="w-20 h-20 rounded-full border-4 border-white bg-slate-100 flex items-center justify-center mx-auto overflow-hidden">
+              {avatar ? (
+                <img src={avatar} alt={name} className="w-full h-full object-cover" />
+              ) : (
+                <span className="text-2xl font-bold text-blue-600">{initials}</span>
+              )}
             </div>
             {isOpenToWork && (
               <Badge className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-[10px]">

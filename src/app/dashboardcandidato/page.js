@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { GlobalNavigation } from '@/components/linktin/Navigation'
 import { ProfileSidebar } from '@/components/linktin/ProfileSidebar'
 import { SkillTag } from '@/components/linktin/SkillTag'
@@ -34,6 +34,8 @@ export default function CandidatoDashboardPage() {
   const [formHab, setFormHab] = useState({ nombre: '', nivel: 'Intermedio' })
   const [guardando, setGuardando] = useState(false)
   const [cvUrl, setCvUrl] = useState(null)
+  const [subiendoCv, setSubiendoCv] = useState(false)
+  const fileInputRef = useRef(null)
 
   const fetchPerfil = async () => {
     try {
@@ -131,6 +133,21 @@ export default function CandidatoDashboardPage() {
     }
   }
 
+  const handleCvUpload = async (e) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setSubiendoCv(true)
+    try {
+      await storageService.uploadFile('cv', file)
+      await fetchPerfil()
+    } catch (err) {
+      alert('Error al subir el CV')
+    } finally {
+      setSubiendoCv(false)
+      if (fileInputRef.current) fileInputRef.current.value = ''
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-50 flex items-center justify-center">
@@ -200,6 +217,7 @@ export default function CandidatoDashboardPage() {
               location={perfil.ubicacion || 'Sin ubicación'}
               profileCompletion={perfil.biografia ? 65 : 30}
               isOpenToWork={true}
+              avatar={perfil.foto_url || null}
             />
           </aside>
 
@@ -444,13 +462,31 @@ export default function CandidatoDashboardPage() {
                       )}
                       <p className="text-xs text-slate-500">Subido</p>
                     </div>
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      ref={fileInputRef}
+                      onChange={handleCvUpload}
+                      className="hidden"
+                    />
+                    <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={subiendoCv}>
+                      <Upload className="h-4 w-4 mr-1" />
+                      {subiendoCv ? 'Subiendo...' : 'Reemplazar'}
+                    </Button>
                   </div>
                 ) : (
                   <div className="text-center py-4">
                     <p className="text-sm text-slate-400 mb-3">Sin CV subido</p>
-                    <Button variant="outline" size="sm">
+                    <input
+                      type="file"
+                      accept=".pdf"
+                      ref={fileInputRef}
+                      onChange={handleCvUpload}
+                      className="hidden"
+                    />
+                    <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()} disabled={subiendoCv}>
                       <Upload className="h-4 w-4 mr-1" />
-                      Subir CV
+                      {subiendoCv ? 'Subiendo...' : 'Subir CV'}
                     </Button>
                   </div>
                 )}
