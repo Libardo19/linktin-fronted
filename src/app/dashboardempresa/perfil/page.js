@@ -11,6 +11,7 @@ import { Pencil, Settings, Share2, Building2, Globe, MapPin, Briefcase, Mail, Ph
 import { empresaService } from '@/services/empresa.service'
 import { useAuth } from '@/context/AuthContext'
 import PerfilEmpresaForm from '@/components/empresa/PerfilEmpresaForm'
+import ResenasPerfil from '@/components/resenas/ResenasPerfil'
 
 export default function PerfilEmpresaPage() {
   const { usuario } = useAuth()
@@ -129,7 +130,11 @@ export default function PerfilEmpresaPage() {
               totalCandidates={0}
               newMatches={0}
               profileCompletion={profileData.profileCompletion}
+              logo={perfil?.logo_url || null}
             />
+
+            {/* Reseñas recibidas - vista compacta */}
+            <ResenasPerfil idUsuario={usuario?.id} compact={true} />
 
             {/* Contact Info */}
             <Card>
@@ -171,11 +176,15 @@ export default function PerfilEmpresaPage() {
                   {/* Avatar */}
                   <div className="relative">
                     <div className="w-32 h-32 rounded-full border-4 border-white bg-slate-100 overflow-hidden">
-                      <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
-                        <span className="text-4xl font-bold text-blue-600">
-                          {(profileData.name || 'E').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
-                        </span>
-                      </div>
+                      {perfil?.logo_url ? (
+                        <img src={perfil.logo_url} alt={profileData.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-blue-100 to-blue-50 flex items-center justify-center">
+                          <span className="text-4xl font-bold text-blue-600">
+                            {(profileData.name || 'E').split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase()}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -215,6 +224,7 @@ export default function PerfilEmpresaPage() {
                 <TabsTrigger value="experience">Ofertas Activas</TabsTrigger>
                 <TabsTrigger value="skills">Habilidades Demandadas</TabsTrigger>
                 <TabsTrigger value="education">Contacto</TabsTrigger>
+                <TabsTrigger value="reviews">Reseñas</TabsTrigger>
               </TabsList>
 
               <TabsContent value="about" className="space-y-4">
@@ -281,6 +291,10 @@ export default function PerfilEmpresaPage() {
                     </div>
                   </CardContent>
                 </Card>
+              </TabsContent>
+
+              <TabsContent value="reviews" className="space-y-4">
+                <ResenasPerfil idUsuario={usuario?.id} />
               </TabsContent>
 
               <TabsContent value="education" className="space-y-4">

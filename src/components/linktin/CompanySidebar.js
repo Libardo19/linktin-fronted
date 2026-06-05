@@ -15,7 +15,8 @@ export function CompanySidebar({
   profileCompletion = 80,
   rating = 4.5,
   founded = '2018',
-  employees = '50-200'
+  employees = '50-200',
+  logo = null
 }) {
   return (
     <div className="space-y-4">
@@ -27,8 +28,12 @@ export function CompanySidebar({
           
           {/* Logo */}
           <div className="relative -mt-8 mb-3">
-            <div className="w-20 h-20 rounded-xl border-4 border-white bg-white flex items-center justify-center mx-auto shadow-sm">
-              <Building2 className="h-10 w-10 text-blue-600" />
+            <div className="w-20 h-20 rounded-xl border-4 border-white bg-white flex items-center justify-center mx-auto shadow-sm overflow-hidden">
+              {logo ? (
+                <img src={logo} alt={companyName} className="w-full h-full object-cover" />
+              ) : (
+                <Building2 className="h-10 w-10 text-blue-600" />
+              )}
             </div>
             <Badge className="absolute -bottom-1 left-1/2 -translate-x-1/2 bg-emerald-500 text-white text-[10px]">
               Verificada
