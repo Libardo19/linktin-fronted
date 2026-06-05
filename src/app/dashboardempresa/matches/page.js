@@ -10,7 +10,9 @@ import { Input } from '@/components/ui/Input'
 import { Search, MapPin, GraduationCap, Mail, Eye, CheckCircle, XCircle, Building2, Zap, Briefcase, Star, MessageCircle } from 'lucide-react'
 import { matchService } from '@/services/match.service'
 import { empresaService } from '@/services/empresa.service'
+import { resenaService } from '@/services/resena.service'
 import Link from 'next/link'
+import ResenaModal from '@/components/resenas/ResenaModal'
 
 const statusColors = {
   pendiente: 'bg-blue-100 text-blue-700',
@@ -31,6 +33,10 @@ export default function EmpresaMatchesPage() {
   const [error, setError] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+  const [misResenas, setMisResenas] = useState([])
+  const [showResenaModal, setShowResenaModal] = useState(false)
+  const [matchParaResena, setMatchParaResena] = useState(null)
+  const [enviandoResena, setEnviandoResena] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,6 +48,10 @@ export default function EmpresaMatchesPage() {
         matchService.getCandidatosEmpresa()
           .then(data => setMatches(data || []))
           .catch(err => console.error('Error al cargar matches:', err))
+
+        resenaService.getMisResenas()
+          .then(setMisResenas)
+          .catch(() => {})
       } catch (err) {
         setError('Error al cargar perfil de empresa')
         console.error(err)
@@ -59,6 +69,24 @@ export default function EmpresaMatchesPage() {
       ))
     } catch (err) {
       console.error('Error al aceptar:', err)
+    }
+  }
+
+  /*
+    Envía una reseña al backend y actualiza la lista local.
+  */
+  const handleEnviarResena = async ({ raiting, comentario }) => {
+    if (!matchParaResena) return
+    setEnviandoResena(true)
+    try {
+      const resena = await resenaService.create(matchParaResena.id_match, raiting, comentario)
+      setMisResenas(prev => [...prev, resena])
+      setShowResenaModal(false)
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Error al enviar la reseña'
+      alert(msg)
+    } finally {
+      setEnviandoResena(false)
     }
   }
 
@@ -255,17 +283,34 @@ export default function EmpresaMatchesPage() {
                             <Eye className="h-4 w-4 mr-1" />
                             Profile
                           </Button>
-                          {match.estadoEmpresa === 'aceptado' ? (
-                            match.estadoUsuario === 'aceptado' ? (
+                          {match.estadoEmpresa === 'aceptado' && match.estadoUsuario === 'aceptado' ? (
+                            <div className="flex flex-col gap-2">
                               <Link href={`/dashboardempresa/mensajes?userId=${match.usuario?.id_usuarios}`}>
                                 <Button size="sm" className="w-full gap-1">
                                   <MessageCircle className="h-4 w-4" />
                                   Chat
                                 </Button>
                               </Link>
-                            ) : (
-                              <span className="text-xs text-emerald-600 font-medium">Accepted</span>
-                            )
+                              {(() => {
+                                const ya = misResenas.find(r => r.match?.id_match === match.id_match)
+                                return (
+                                  <Button
+                                    size="sm"
+                                    variant={ya ? 'ghost' : 'outline'}
+                                    className={`w-full gap-1 ${ya ? 'text-emerald-600' : ''}`}
+                                    onClick={() => {
+                                      setMatchParaResena(match)
+                                      setShowResenaModal(true)
+                                    }}
+                                  >
+                                    <Star className={`h-3.5 w-3.5 ${ya ? 'fill-emerald-500' : ''}`} />
+                                    {ya ? 'Reseñado' : 'Reseñar'}
+                                  </Button>
+                                )
+                              })()}
+                            </div>
+                          ) : match.estadoEmpresa === 'aceptado' ? (
+                            <span className="text-xs text-emerald-600 font-medium">Accepted</span>
                           ) : match.estadoEmpresa === 'rechazado' ? (
                             <span className="text-xs text-red-500 font-medium">Rejected</span>
                           ) : (
@@ -306,6 +351,21 @@ export default function EmpresaMatchesPage() {
           </div>
         </div>
       </main>
+      {/* Modal de reseña */}
+      <ResenaModal
+        isOpen={showResenaModal}
+        onClose={() => {
+          setShowResenaModal(false)
+          setMatchParaResena(null)
+        }}
+        onSubmit={handleEnviarResena}
+        targetName={
+          matchParaResena?.usuario?.perfil_candidato
+            ? `${matchParaResena.usuario.perfil_candidato.nombres} ${matchParaResena.usuario.perfil_candidato.apellidos}`
+            : 'Candidato'
+        }
+        loading={enviandoResena}
+      />
     </div>
   )
 }

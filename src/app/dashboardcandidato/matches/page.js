@@ -13,12 +13,15 @@ import {
   Search,
   ChevronRight,
   Briefcase,
+  Star,
 } from 'lucide-react'
 import { matchService } from '@/services/match.service'
 import { ofertaService } from '@/services/oferta.service'
 import { recommendationService } from '@/services/recommendation.service'
+import { resenaService } from '@/services/resena.service'
 import { useAuth } from '@/context/AuthContext'
 import Link from 'next/link'
+import ResenaModal from '@/components/resenas/ResenaModal'
 
 const SWIPE_THRESHOLD = 100
 
@@ -30,6 +33,10 @@ export default function MatchesPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
   const [likeError, setLikeError] = useState(null)
+  const [misResenas, setMisResenas] = useState([])
+  const [showResenaModal, setShowResenaModal] = useState(false)
+  const [matchParaResena, setMatchParaResena] = useState(null)
+  const [enviandoResena, setEnviandoResena] = useState(false)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [swipeDirection, setSwipeDirection] = useState(null)
   const [dragOffset, setDragOffset] = useState(0)
@@ -49,6 +56,11 @@ export default function MatchesPage() {
         setMisMatches(matchesData || [])
 
         if (usuario?.id) {
+          // Cargar reseñas enviadas por el usuario para saber cuáles ya hizo
+          resenaService.getMisResenas()
+            .then(setMisResenas)
+            .catch(() => {})
+
           recommendationService.getRecomendaciones(usuario.id)
             .then(recomendaciones => {
               const map = {}
@@ -96,6 +108,24 @@ export default function MatchesPage() {
     setLikeError(null)
     setTimeout(advanceCard, 300)
   }, [currentIndex, ofertasDisponibles, scoresMap, advanceCard])
+
+  /*
+    Envía una reseña al backend y actualiza la lista local.
+  */
+  const handleEnviarResena = async ({ raiting, comentario }) => {
+    if (!matchParaResena) return
+    setEnviandoResena(true)
+    try {
+      const resena = await resenaService.create(matchParaResena.id_match, raiting, comentario)
+      setMisResenas(prev => [...prev, resena])
+      setShowResenaModal(false)
+    } catch (err) {
+      const msg = err.response?.data?.message || 'Error al enviar la reseña'
+      alert(msg)
+    } finally {
+      setEnviandoResena(false)
+    }
+  }
 
   const handleDragStart = useCallback((clientX) => {
     if (swipeDirection) return
@@ -311,29 +341,48 @@ export default function MatchesPage() {
                   </div>
 
                   <div className="space-y-3">
-                    {misMatches.map((match) => (
-                      <Link
-                        key={match.id_match}
-                        href="/dashboardcandidato/mensajes"
-                        className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-slate-50 transition-colors group no-underline"
-                      >
-                        <div className="relative">
-                          <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center ring-2 ring-emerald-500 ring-offset-2 ring-offset-white transition-all group-hover:ring-offset-slate-50">
-                            <Building2 className="h-6 w-6 text-slate-400" />
-                          </div>
-                          <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white" />
+                    {misMatches.map((match) => {
+                      const yaResenado = misResenas.find(r => r.match?.id_match === match.id_match)
+                      return (
+                        <div key={match.id_match} className="flex items-center gap-2 group">
+                          <Link
+                            href="/dashboardcandidato/mensajes"
+                            className="flex items-center gap-3 w-full p-3 rounded-xl hover:bg-slate-50 transition-colors group/link no-underline"
+                          >
+                            <div className="relative">
+                              <div className="w-12 h-12 rounded-xl bg-slate-100 flex items-center justify-center ring-2 ring-emerald-500 ring-offset-2 ring-offset-white transition-all group-hover/link:ring-offset-slate-50">
+                                <Building2 className="h-6 w-6 text-slate-400" />
+                              </div>
+                              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 rounded-full border-2 border-white" />
+                            </div>
+                            <div className="flex-1 text-left">
+                              <p className="font-medium text-slate-900 text-sm">
+                                {match.oferta?.perfil_empresa?.nombre || 'Empresa'}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                Match · Ir al chat
+                              </p>
+                            </div>
+                            <ChevronRight className="h-4 w-4 text-slate-400 opacity-0 group-hover/link:opacity-100 transition-opacity" />
+                          </Link>
+                          {/* Botón de reseña */}
+                          <button
+                            onClick={() => {
+                              setMatchParaResena(match)
+                              setShowResenaModal(true)
+                            }}
+                            className={`p-2 rounded-lg transition-colors flex-shrink-0 ${
+                              yaResenado
+                                ? 'text-emerald-500 hover:bg-emerald-50'
+                                : 'text-slate-300 hover:text-amber-500 hover:bg-amber-50'
+                            }`}
+                            title={yaResenado ? 'Ya reseñaste' : 'Reseñar'}
+                          >
+                            <Star className={`h-4 w-4 ${yaResenado ? 'fill-emerald-500' : ''}`} />
+                          </button>
                         </div>
-                        <div className="flex-1 text-left">
-                          <p className="font-medium text-slate-900 text-sm">
-                            {match.oferta?.perfil_empresa?.nombre || 'Empresa'}
-                          </p>
-                          <p className="text-xs text-slate-500">
-                            Match · Ir al chat
-                          </p>
-                        </div>
-                        <ChevronRight className="h-4 w-4 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
-                      </Link>
-                    ))}
+                      )
+                    })}
                   </div>
                 </div>
               )}
@@ -355,6 +404,17 @@ export default function MatchesPage() {
           </aside>
         </div>
       </main>
+      {/* Modal de reseña */}
+      <ResenaModal
+        isOpen={showResenaModal}
+        onClose={() => {
+          setShowResenaModal(false)
+          setMatchParaResena(null)
+        }}
+        onSubmit={handleEnviarResena}
+        targetName={matchParaResena?.oferta?.perfil_empresa?.nombre || ''}
+        loading={enviandoResena}
+      />
     </div>
   )
 }
